@@ -6,22 +6,16 @@ using Ax.Engine.ECS.Components;
 
 namespace Ax.Engine.ECS
 {
-    public class EntityManager
+    public static class EntityManager
     {
         private static int LastEntityId = 0;
 
-        private readonly List<Entity> entities = new List<Entity>();
+        private static readonly List<Entity> entities = new List<Entity>();
+        private static readonly Dictionary<Type, List<Entity>> componentsRegistry = new Dictionary<Type, List<Entity>>();
 
-        private static EntityManager instance;
+        private static bool registryEnabled;
 
-        public EntityManager()
-        {
-            if(instance != null) { throw new Exception("An entity manager is already running"); }
-
-            instance = this;
-        }
-
-        public void Update()
+        public static void Update()
         {
             for (int i = 0; i < entities.Count; i++)
             {
@@ -29,7 +23,7 @@ namespace Ax.Engine.ECS
             }
         }
 
-        public void Render(ref OutputHandler.SurfaceItem[,] surface)
+        public static void Render(ref OutputHandler.SurfaceItem[,] surface)
         {
             for (int i = 0; i < entities.Count; i++)
             {
@@ -37,12 +31,7 @@ namespace Ax.Engine.ECS
             }
         }
 
-        public static IEnumerable<Entity> FindEntitiesWithComponent<T>() where T: Component
-        {
-            return instance.entities.Where(e => e.IsActive && e.HasComponent<T>());
-        }
-
-        public Entity AddEntity()
+        public static Entity AddEntity()
         {
             Entity e = new Entity();
             e.Transform = e.AddComponent<TransformComponent>();
@@ -53,16 +42,59 @@ namespace Ax.Engine.ECS
             return e;
         }
 
-        public void Destroy(Entity e)
+        public static void Destroy(Entity e)
         {
             if (!entities.Contains(e)) { return; }
 
             entities.Remove(e);
         }
 
-        public void Destroy(int referenceId)
+        public static void Destroy(int referenceId)
         {
             Destroy(entities.Find(e => e.ReferenceId == referenceId));
+        }
+
+        public static IEnumerable<Entity> FindEntitiesWithComponent<T>() where T : Component
+        {
+            return entities.Where(e => e.IsActive && e.HasComponent<T>());
+        }
+
+        public static void EnableRegistry(bool regenerate)
+        {
+            registryEnabled = true;
+
+            if(regenerate)
+            {
+                componentsRegistry.Clear();
+
+                foreach (Entity entity in entities)
+                {
+                    foreach (Component component in entity._components)
+                    {
+
+                    }
+                }
+            }
+        }
+
+        public static void DisableRegistry()
+        {
+            registryEnabled = false;
+        }
+
+        internal static void RegisterAddEntityComponent(Type component, Entity entity)
+        {
+            if(!componentsRegistry.ContainsKey(component))
+            {
+                componentsRegistry.Add(component, new List<Entity>());
+            }
+
+            componentsRegistry[component].Add(entity);
+        }
+
+        internal static void RegisterDestroyEntityComponent(Type component, Entity entity)
+        {
+            componentsRegistry[component].Remove(entity);
         }
     }
 }

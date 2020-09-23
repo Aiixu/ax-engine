@@ -6,24 +6,6 @@ namespace Ax.Engine.Core
 {
     public sealed class InputHandler
     {
-        private static bool GetStdIn(out IntPtr handle)
-        {
-            handle = GetStdHandle(STD_INPUT_HANDLE);
-            return handle != INVALID_HANDLE;
-        }
-
-        private static bool GetConsoleModeOut(IntPtr hConsoleHandle, out CONSOLE_MODE_INPUT mode)
-        {
-            if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
-            {
-                mode = 0;
-                return false;
-            }
-
-            mode = (CONSOLE_MODE_INPUT)lpMode;
-            return true;
-        }
-
         public IntPtr HIN { get => hIn; }
 
         private IntPtr hIn;
@@ -43,6 +25,24 @@ namespace Ax.Engine.Core
         {
             this.hIn = IntPtr.Zero;
             return GetStdIn(out IntPtr hIn) && SetConsoleMode(hIn, (uint)inLast);
+        }
+
+        private bool GetStdIn(out IntPtr handle)
+        {
+            handle = GetStdHandle(STD_INPUT_HANDLE);
+            return handle != INVALID_HANDLE;
+        }
+
+        private bool GetConsoleModeOut(IntPtr hConsoleHandle, out CONSOLE_MODE_INPUT mode)
+        {
+            if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
+            {
+                mode = 0;
+                return false;
+            }
+
+            mode = (CONSOLE_MODE_INPUT)lpMode;
+            return true;
         }
     }
 }

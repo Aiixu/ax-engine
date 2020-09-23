@@ -20,7 +20,7 @@ namespace Ax.Engine
 
             game.OpenDevMenu = true;
 
-            CameraComponent camera = game.entityMgr.AddEntity().AddComponent<CameraComponent>();
+            //CameraComponent camera = game.entityMgr.AddEntity().AddComponent<CameraComponent>();
             
             while (game.IsRunning)
             {

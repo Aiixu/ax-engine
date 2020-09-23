@@ -3,14 +3,14 @@
 using Ax.Engine.ECS;
 using Ax.Engine.Core;
 using Ax.Engine.Utils;
+using Ax.Engine.ECS.Components;
+using System.Linq;
 
 namespace Ax.Engine
 {
     public sealed class Game
     {
         internal static Game Instance;
-
-        public readonly EntityManager entityMgr;
 
         public bool IsRunning { get; private set; } = false;
         public bool OpenDevMenu { get; set; } = false;
@@ -30,8 +30,6 @@ namespace Ax.Engine
                 Console.WriteLine("A game is already running !");
                 return;
             }
-
-            entityMgr = new EntityManager();
 
             HWND = hWnd;
             HMENU = hMenu;
@@ -57,7 +55,7 @@ namespace Ax.Engine
         {
             if (!IsRunning) { return; }
 
-            entityMgr.Update();
+            EntityManager.Update();
             FrameCount++;
         }
 
@@ -71,10 +69,10 @@ namespace Ax.Engine
             {
                 OutputHandler.RenderData lastFrame = OutputHandler.LastFrameData;
 
-                string glob = lastFrame.globalTime.ToString();
-                string calc = lastFrame.calculationTime.ToString();
-                string rele = lastFrame.releaseTime.ToString();
-                string writ = lastFrame.writeTime.ToString();
+                string glob = lastFrame.GlobalTime.ToString();
+                string calc = lastFrame.CalculationTime.ToString();
+                string rele = lastFrame.ReleaseTime.ToString();
+                string writ = lastFrame.WriteTime.ToString();
 
                 OutputHandler.RenderStr(0, 0, int.MaxValue, "┌────────────┐", Color.White, Color.Black, true);
                 OutputHandler.RenderStr(0, 1, int.MaxValue, "│GLOB        │", Color.White, Color.Black, true);
@@ -89,7 +87,12 @@ namespace Ax.Engine
                 OutputHandler.RenderStr(6, 4, int.MaxValue, writ, Color.White, Color.Black, true);
             }
 
-            entityMgr.Render(ref OutputHandler.surface);
+            if(EntityManager.CountEntitiesWithComponent<CameraComponent>() == 0)
+            {
+                OutputHandler.RenderStr(Console.WindowWidth / 2 - 9, MathHelper.FloorToInt(Console.WindowHeight / 2f) - 1, int.MaxValue, "NO CAMERA RENDERING", Color.White, Color.Black, true);
+            }
+
+            EntityManager.Render(ref OutputHandler.surface);
 
             OutputHandler.ReleaseSurface();
         }

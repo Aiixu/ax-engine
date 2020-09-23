@@ -25,24 +25,6 @@ namespace Ax.Engine.Core
         public static string GetColorForegroundString(byte r, byte g, byte b) => string.Concat(ESC, "[38;2;", BytesMap[r], ";", BytesMap[g], ";", BytesMap[b], "m");
 
         private static readonly string[] BytesMap = Enumerable.Range(0, 256).Select(s => s.ToString()).ToArray();
-        
-        private static bool GetStdOut(out IntPtr handle)
-        {
-            handle = GetStdHandle(STD_OUTPUT_HANDLE);
-            return handle != INVALID_HANDLE;
-        }
-
-        private static bool GetConsoleModeIn(IntPtr hConsoleHandle, out CONSOLE_MODE_OUTPUT mode)
-        {
-            if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
-            {
-                mode = 0;
-                return false;
-            }
-
-            mode = (CONSOLE_MODE_OUTPUT)lpMode;
-            return true;
-        }
 
         public IntPtr HOUT { get => hOut; }
 
@@ -206,8 +188,8 @@ namespace Ax.Engine.Core
                     }
                     else
                     {
-                        string bg = GetColorBackgroundString((byte)(255 * (x % 2)), 0, 0);
-                        bytesBuilder.Append(bg);
+                        /*string bg = GetColorBackgroundString((byte)(255 * (x % 2)), 0, 0);
+                        bytesBuilder.Append(bg);*/
                         bytesBuilder.Append(' ');
                     }
                 }
@@ -225,13 +207,31 @@ namespace Ax.Engine.Core
 
             LastFrameData = new RenderData()
             {
-                calculationTime = calculationStopwatch.ElapsedMilliseconds,
-                releaseTime = releaseStopwatch.ElapsedMilliseconds,
-                writeTime = writeStopwatch.ElapsedMilliseconds,
-                globalTime = globalStopwatch.ElapsedMilliseconds
+                CalculationTime = calculationStopwatch.ElapsedMilliseconds,
+                ReleaseTime = releaseStopwatch.ElapsedMilliseconds,
+                WriteTime = writeStopwatch.ElapsedMilliseconds,
+                GlobalTime = globalStopwatch.ElapsedMilliseconds
             };
 
             return written;
+        }
+
+        private bool GetStdOut(out IntPtr handle)
+        {
+            handle = GetStdHandle(STD_OUTPUT_HANDLE);
+            return handle != INVALID_HANDLE;
+        }
+
+        private bool GetConsoleModeIn(IntPtr hConsoleHandle, out CONSOLE_MODE_OUTPUT mode)
+        {
+            if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
+            {
+                mode = 0;
+                return false;
+            }
+
+            mode = (CONSOLE_MODE_OUTPUT)lpMode;
+            return true;
         }
 
         public struct SurfaceItem : IEquatable<SurfaceItem>
@@ -261,10 +261,10 @@ namespace Ax.Engine.Core
         
         public struct RenderData
         {
-            public long calculationTime;
-            public long releaseTime;
-            public long writeTime;
-            public long globalTime;
+            public long CalculationTime { get; internal set; } 
+            public long ReleaseTime { get; internal set; }
+            public long WriteTime { get; internal set; }
+            public long GlobalTime { get; internal set; }
         }
     }
 }
