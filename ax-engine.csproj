@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{937DCCDC-595D-4717-B420-FE4318CBE19E}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Ax.Engine</RootNamespace>
+    <AssemblyName>ax-engine</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\Collisions.cs" />
+    <Compile Include="Core\InputHandler.cs" />
+    <Compile Include="Core\Enums\NativeConsoleEvents.cs" />
+    <Compile Include="Core\Enums\NativeConsoleModeInput.cs" />
+    <Compile Include="Core\Enums\NativeConsoleModeOutput.cs" />
+    <Compile Include="Core\Enums\NativeCtrlTypes.cs" />
+    <Compile Include="Core\Enums\NativeLF.cs" />
+    <Compile Include="Core\Enums\NativeMF.cs" />
+    <Compile Include="Core\Enums\NativeSC.cs" />
+    <Compile Include="Core\Enums\NativeSCF.cs" />
+    <Compile Include="Core\Enums\NativeSWP.cs" />
+    <Compile Include="Core\Enums\NativeTMPF.cs" />
+    <Compile Include="Core\Interop\NativeConsoleDisplay.cs" />
+    <Compile Include="Core\Interop\NativeConsoleFonts.cs" />
+    <Compile Include="Core\Interop\NativeBuffering.cs" />
+    <Compile Include="Core\Interop\NativeConsoleAliases.cs" />
+    <Compile Include="Core\Interop\NativeConsoleHistory.cs" />
+    <Compile Include="Core\Interop\NativeConsoleInput.cs" />
+    <Compile Include="Core\Interop\NativeConsoleMode.cs" />
+    <Compile Include="Core\Interop\NativeConsoleProcess.cs" />
+    <Compile Include="Core\Interop\NativeConsoleRead.cs" />
+    <Compile Include="Core\Interop\NativeConsoleWrite.cs" />
+    <Compile Include="Core\Interop\NativeCtrlEvents.cs" />
+    <Compile Include="Core\Interop\NativeHandles.cs" />
+    <Compile Include="Core\OutputHandler.cs" />
+    <Compile Include="Core\Structs\NativeCharInfo.cs" />
+    <Compile Include="Core\Structs\NativeColorRef.cs" />
+    <Compile Include="Core\Structs\NativeConsoleCursorInfo.cs" />
+    <Compile Include="Core\Structs\NativeConsoleHistoryInfo.cs" />
+    <Compile Include="Core\Structs\NativeConsoleScreenBufferInfo.cs" />
+    <Compile Include="Core\Structs\NativeConsoleFont.cs" />
+    <Compile Include="Core\Structs\NativeCoords.cs" />
+    <Compile Include="Core\Structs\NativeFocusEventRecord.cs" />
+    <Compile Include="Core\Structs\NativeInputRecord.cs" />
+    <Compile Include="Core\Structs\NativeKeyEventRecord.cs" />
+    <Compile Include="Core\Structs\NativeMouseEventRecord.cs" />
+    <Compile Include="Core\Structs\NativeConsoleSelectionInfo.cs" />
+    <Compile Include="Core\Structs\NativeMenuRecord.cs" />
+    <Compile Include="Core\Structs\NativeSmallRect.cs" />
+    <Compile Include="Core\Structs\NativeWindowBufferSizeRecord.cs" />
+    <Compile Include="ECS\Component.cs" />
+    <Compile Include="ECS\Components\CameraComponent.cs" />
+    <Compile Include="ECS\Components\UI\CanvasComponent.cs" />
+    <Compile Include="ECS\Components\ColliderComponent.cs" />
+    <Compile Include="ECS\Components\SpriteComponent.cs" />
+    <Compile Include="ECS\Components\TransformComponent.cs" />
+    <Compile Include="ECS\Entity.cs" />
+    <Compile Include="ECS\EntityManager.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GameBuilder.cs" />
+    <Compile Include="Utils\Color.cs" />
+    <Compile Include="Utils\DefaultValue.cs" />
+    <Compile Include="Utils\MathHelper.cs" />
+    <Compile Include="Utils\Rect.cs" />
+    <Compile Include="Utils\RectInt.cs" />
+    <Compile Include="Utils\Vector2.cs" />
+    <Compile Include="Utils\Vector2Int.cs" />
+    <Compile Include="Core\Native.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
