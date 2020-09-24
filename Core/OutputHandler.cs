@@ -170,7 +170,9 @@ namespace Ax.Engine.Core
         {
             releaseStopwatch.Start();
             StringBuilder bytesBuilder = new StringBuilder();
-            
+
+            bool lastPixelIsBackground = true;
+
             for (int y = 0; y < surfaceSet.GetLength(1); y++)
             {
                 for (int x = 0; x < surfaceSet.GetLength(0); x++)
@@ -185,11 +187,19 @@ namespace Ax.Engine.Core
                         bytesBuilder.Append(bg);
                         bytesBuilder.Append(fg);
                         bytesBuilder.Append(surfaceItem.ch);
+
+                        lastPixelIsBackground = false;
                     }
                     else
                     {
-                        /*string bg = GetColorBackgroundString((byte)(255 * (x % 2)), 0, 0);
-                        bytesBuilder.Append(bg);*/
+                        if(!lastPixelIsBackground)
+                        {
+                            string bg = GetColorBackgroundString(0, 0, 0);
+                            bytesBuilder.Append(bg);
+
+                            lastPixelIsBackground = true;
+                        }
+
                         bytesBuilder.Append(' ');
                     }
                 }

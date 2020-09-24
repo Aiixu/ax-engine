@@ -20,6 +20,8 @@ namespace Ax.Engine.ECS
         {
             for (int i = 0; i < entities.Count; i++)
             {
+                if (!entities[i].IsActive) { continue; }
+
                 entities[i].Update();
             }
         }
@@ -28,6 +30,8 @@ namespace Ax.Engine.ECS
         {
             for (int i = 0; i < entities.Count; i++)
             {
+                if (!entities[i].IsActive) { continue; }
+
                 entities[i].Render(outputHandler);
             }
         }

@@ -1,8 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Drawing;
 
 using Ax.Engine.Core;
 using Ax.Engine.Utils;
+
+using Color = Ax.Engine.Utils.Color;
 
 namespace Ax.Engine.ECS.Components
 {
@@ -17,11 +20,17 @@ namespace Ax.Engine.ECS.Components
         public Bitmap[] frames;
         public RectInt sourceRect;
 
-        public int FrameDelta;
+        /// <summary>
+        /// Delay between two animation frame update in milliseconds
+        /// </summary>
+        public float animationDelay;
 
         public RenderMode renderMode;
 
         private RectInt destRect;
+
+        private DateTime lastFrameRendered;
+        private int currentFrame;
 
         public int Width
         {
@@ -37,8 +46,10 @@ namespace Ax.Engine.ECS.Components
 
         public override void Init()
         {
-            sourceRect = new RectInt(0, 0, 16, 16);
-            destRect = new RectInt(0, 0, 16, 16);
+            sourceRect = new RectInt(0, 0, 8, 8);
+            destRect = new RectInt(0, 0, 8, 8);
+
+            lastFrameRendered = DateTime.Now;
         }
 
         public override void Update()
@@ -49,23 +60,34 @@ namespace Ax.Engine.ECS.Components
 
         public override void Render(OutputHandler outputHandler)
         {
-            for (int y = 0; y < destRect.Height; y++)
+            if((DateTime.Now - lastFrameRendered).TotalMilliseconds >= animationDelay)
             {
-                for (int x = 0; x < destRect.Width; x++)
-                {
+                currentFrame = (currentFrame + 1) % frames.Length;
+                lastFrameRendered = DateTime.Now;
+            }
 
+            Bitmap frame = frames[currentFrame];
+            for (int y = 0; y < frame.Height; y++)
+            {
+                for (int x = 0; x < frame.Width; x++)
+                {
+                    System.Drawing.Color pixel = frame.GetPixel(x, y);
+                    if (pixel.A == 0) { continue; } // todo: implement alpha threshold
+
+                    outputHandler.RenderCh(destRect.X + x, destRect.Y + y, 0, ' ', Color.Black, Color.FromColor(pixel));
                 }
             }
         }
 
-        public void ImportSheet(string folder)
+        public void ImportSheet(string folder, Vector2Int frameSize)
         {
-            string[] rawFrames = Directory.GetFiles(folder, "*.png");
+            string[] rawFrames = Directory.GetFiles(folder);
             frames = new Bitmap[rawFrames.Length];
 
             for (int i = 0; i < frames.Length; i++)
             {
-                frames[i] = (Bitmap)Image.FromFile(rawFrames[i]);
+                Bitmap bmp = (Bitmap)Image.FromFile(rawFrames[i]);                
+                frames[i] = new Bitmap(bmp, frameSize.x, frameSize.y);
             }
         }
     }
