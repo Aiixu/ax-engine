@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using Ax.Engine.Core;
 using Ax.Engine.ECS.Components;
 
@@ -54,11 +55,6 @@ namespace Ax.Engine.ECS
             Destroy(entities.Find(e => e.ReferenceId == referenceId));
         }
 
-        public static IEnumerable<Entity> FindEntitiesWithComponent<T>() where T : Component
-        {
-            return entities.Where(e => e.IsActive && e.HasComponent<T>());
-        }
-
         public static void EnableRegistry(bool regenerate)
         {
             registryEnabled = true;
@@ -67,11 +63,24 @@ namespace Ax.Engine.ECS
             {
                 componentsRegistry.Clear();
 
-                foreach (Entity entity in entities)
+                for (int i = 0; i < entities.Count; i++)
                 {
-                    foreach (Component component in entity._components)
-                    {
+                    Entity entity = entities[i];
 
+                    for (int j = 0; j < entity.Components.Count; j++)
+                    {
+                        Type componentType = entity.Components[i].GetType();
+
+                        if(!componentsRegistry.ContainsKey(componentType))
+                        {
+                            componentsRegistry.Add(componentType, new List<Entity>());
+                        }
+                        else if(componentsRegistry[componentType].Contains(entity))
+                        {
+                            continue;
+                        }
+
+                        componentsRegistry[componentType].Add(entity);
                     }
                 }
             }
@@ -80,6 +89,24 @@ namespace Ax.Engine.ECS
         public static void DisableRegistry()
         {
             registryEnabled = false;
+        }
+
+        public static bool EntityExistsWithComponent<T>() where T: Component
+        {
+            Type typeofT = typeof(T);
+            return registryEnabled ? componentsRegistry.ContainsKey(typeofT) && CountEntitiesWithComponent<T>() != 0 : entities.Any(e => e.IsActive && e.HasComponent<T>());
+        }
+
+        public static int CountEntitiesWithComponent<T>() where T: Component
+        {
+            Type typeofT = typeof(T);
+            return registryEnabled ? componentsRegistry.TryGetValue(typeofT, out List<Entity> registryEntities) ? registryEntities.Count : 0 : FindEntitiesWithComponent<T>().Count();
+        }
+
+        public static IEnumerable<Entity> FindEntitiesWithComponent<T>() where T : Component
+        {
+            Type typeofT = typeof(T);
+            return registryEnabled ? componentsRegistry.TryGetValue(typeofT, out List<Entity> registryEntities) ? registryEntities : null : entities.Where(e => e.IsActive && e.HasComponent<T>());
         }
 
         internal static void RegisterAddEntityComponent(Type component, Entity entity)

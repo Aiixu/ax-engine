@@ -87,12 +87,14 @@ namespace Ax.Engine
                 OutputHandler.RenderStr(6, 4, int.MaxValue, writ, Color.White, Color.Black, true);
             }
 
-            if(EntityManager.CountEntitiesWithComponent<CameraComponent>() == 0)
+            if (!EntityManager.EntityExistsWithComponent<CameraComponent>())
             {
                 OutputHandler.RenderStr(Console.WindowWidth / 2 - 9, MathHelper.FloorToInt(Console.WindowHeight / 2f) - 1, int.MaxValue, "NO CAMERA RENDERING", Color.White, Color.Black, true);
             }
-
-            EntityManager.Render(ref OutputHandler.surface);
+            else
+            {
+                EntityManager.Render(ref OutputHandler.surface);
+            }
 
             OutputHandler.ReleaseSurface();
         }

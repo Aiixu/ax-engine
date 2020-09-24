@@ -12,32 +12,32 @@ namespace Ax.Engine.ECS
 
         public TransformComponent Transform { get; internal set; }
 
-        internal Dictionary<Type, bool> componentsRegistry { get; } = new Dictionary<Type, bool>();
-        internal List<Component> _components { get; } = new List<Component>(MAX_COMPONENTS_COUNT);
+        internal Dictionary<Type, bool> ComponentsRegistry { get; } = new Dictionary<Type, bool>();
+        internal List<Component> Components { get; } = new List<Component>(MAX_COMPONENTS_COUNT);
 
         public bool IsActive { get; private set; }
         public int ReferenceId { get; internal set; }
 
         public void Update()
         {
-            for (int i = 0; i < _components.Count; i++)
+            for (int i = 0; i < Components.Count; i++)
             {
-                _components[i].Update();
+                Components[i].Update();
             }
         }
 
         public void Render(ref OutputHandler.SurfaceItem[,] surface)
         {
-            for (int i = 0; i < _components.Count; i++)
+            for (int i = 0; i < Components.Count; i++)
             {
-                _components[i].Render(ref surface);
+                Components[i].Render(ref surface);
             }
         }
 
         public bool HasComponent<T>() where T : Component
         {
             Type typeofT = typeof(T);
-            return componentsRegistry.ContainsKey(typeofT) && componentsRegistry[typeofT];
+            return ComponentsRegistry.ContainsKey(typeofT) && ComponentsRegistry[typeofT];
         }
 
         public bool HasComponent<T>(out T c) where T: Component
@@ -49,7 +49,7 @@ namespace Ax.Engine.ECS
         {
             Type typeofT = typeof(T);
 
-            if (!componentsRegistry[typeofT])
+            if (!ComponentsRegistry[typeofT])
             {
                 EntityManager.RegisterAddEntityComponent(typeofT, this);
             }
@@ -59,27 +59,27 @@ namespace Ax.Engine.ECS
             }
 
             T c = new T { Entity = this };
-            _components.Add(c);
+            Components.Add(c);
 
             c.Transform = Transform;
             c.Init();
 
-            componentsRegistry[typeofT] = true;
+            ComponentsRegistry[typeofT] = true;
 
             return c;
         }
 
         public T GetComponent<T>() where T: Component
         {
-            return HasComponent<T>() ? (T)_components.Find(c => c.GetType() == typeof(T)) : null;
+            return HasComponent<T>() ? (T)Components.Find(c => c.GetType() == typeof(T)) : null;
         }
 
         public void DestroyComponent<T>() where T : Component
         {
             Type typeofT = typeof(T);
 
-            _components.RemoveAll(c => c.GetType() == typeofT);
-            componentsRegistry[typeofT] = false;
+            Components.RemoveAll(c => c.GetType() == typeofT);
+            ComponentsRegistry[typeofT] = false;
 
             EntityManager.RegisterDestroyEntityComponent(typeofT, this);
         }
