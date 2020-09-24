@@ -51,6 +51,8 @@ namespace Ax.Engine.Utils
         public static Color Blue => new Color(0, 255, 0);
         public static Color Green => new Color(0, 0, 255);
 
+        public static Color FromColor(System.Drawing.Color rgb) => FromRgb(rgb.R, rgb.G, rgb.B);
+
         public static Color FromRgb(byte r, byte g, byte b) => new Color(r, g, b);
         
         public static Color FromHex(string hex)

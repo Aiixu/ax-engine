@@ -1,13 +1,12 @@
-﻿using System.Drawing;
+﻿using System.IO;
+using System.Drawing;
 
 using Ax.Engine.Core;
 using Ax.Engine.Utils;
 
-using Color = Ax.Engine.Utils.Color;
-
 namespace Ax.Engine.ECS.Components
 {
-    public sealed class SpriteComponent : Component
+    public sealed class AnimatedSpriteComponent : Component
     {
         public enum RenderMode
         {
@@ -15,8 +14,10 @@ namespace Ax.Engine.ECS.Components
             Resize
         }
 
-        public Bitmap texture;
+        public Bitmap[] frames;
         public RectInt sourceRect;
+
+        public int FrameDelta;
 
         public RenderMode renderMode;
 
@@ -36,8 +37,8 @@ namespace Ax.Engine.ECS.Components
 
         public override void Init()
         {
-            sourceRect = new RectInt(0, 0, 8, 8);
-            destRect = new RectInt(0, 0, 8, 8);
+            sourceRect = new RectInt(0, 0, 16, 16);
+            destRect = new RectInt(0, 0, 16, 16);
         }
 
         public override void Update()
@@ -52,8 +53,19 @@ namespace Ax.Engine.ECS.Components
             {
                 for (int x = 0; x < destRect.Width; x++)
                 {
-                    outputHandler.RenderCh(destRect.X + x, destRect.Y + y, 0, ' ', Color.Black, Color.FromColor(texture.GetPixel(x, y)));
+
                 }
+            }
+        }
+
+        public void ImportSheet(string folder)
+        {
+            string[] rawFrames = Directory.GetFiles(folder, "*.png");
+            frames = new Bitmap[rawFrames.Length];
+
+            for (int i = 0; i < frames.Length; i++)
+            {
+                frames[i] = (Bitmap)Image.FromFile(rawFrames[i]);
             }
         }
     }

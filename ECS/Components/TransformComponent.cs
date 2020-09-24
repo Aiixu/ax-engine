@@ -4,8 +4,8 @@ namespace Ax.Engine.ECS.Components
 {
     public sealed class TransformComponent : Component
     {
-        public Vector2 position;
-        public Vector2 scale;
+        public Vector2 position = Vector2.Zero;
+        public Vector2 scale = Vector2.One;
 
         public TransformComponent()
         {

@@ -94,6 +94,7 @@
     <Compile Include="Core\Structs\NativeWindowBufferSizeRecord.cs" />
     <Compile Include="ECS\Component.cs" />
     <Compile Include="ECS\ComponentAttributes\UniqueComponentAttribute.cs" />
+    <Compile Include="ECS\Components\AnimatedSpriteComponent.cs" />
     <Compile Include="ECS\Components\CameraComponent.cs" />
     <Compile Include="ECS\Components\UI\CanvasComponent.cs" />
     <Compile Include="ECS\Components\ColliderComponent.cs" />

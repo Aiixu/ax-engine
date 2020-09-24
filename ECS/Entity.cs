@@ -26,11 +26,11 @@ namespace Ax.Engine.ECS
             }
         }
 
-        public void Render(ref OutputHandler.SurfaceItem[,] surface)
+        public void Render(OutputHandler outputHandler)
         {
             for (int i = 0; i < Components.Count; i++)
             {
-                Components[i].Render(ref surface);
+                Components[i].Render(outputHandler);
             }
         }
 

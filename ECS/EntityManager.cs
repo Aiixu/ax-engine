@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.AccessControl;
+using System.Collections.Generic;
+
 using Ax.Engine.Core;
 using Ax.Engine.ECS.Components;
 
@@ -24,11 +24,11 @@ namespace Ax.Engine.ECS
             }
         }
 
-        public static void Render(ref OutputHandler.SurfaceItem[,] surface)
+        public static void Render(OutputHandler outputHandler)
         {
             for (int i = 0; i < entities.Count; i++)
             {
-                entities[i].Render(ref surface);
+                entities[i].Render(outputHandler);
             }
         }
 

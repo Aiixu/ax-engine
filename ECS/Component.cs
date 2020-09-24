@@ -5,13 +5,18 @@ namespace Ax.Engine.ECS
 {
     public class Component
     {
+        public Component()
+        {
+            Init();
+        }
+
         public Entity Entity { get; internal set; }
 
         public TransformComponent Transform { get; internal set; }
 
         public virtual void Init() { }
         public virtual void Update() { }
-        public virtual void Render(ref OutputHandler.SurfaceItem[,] surface) { }
+        public virtual void Render(OutputHandler outputHandler) { }
 
         // Entity implementation
         public bool HasComponent<T>() where T : Component => Entity.HasComponent<T>(); 
