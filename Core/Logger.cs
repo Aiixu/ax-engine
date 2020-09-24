@@ -15,10 +15,11 @@ namespace Ax.Engine.Core
 
             DateTime now = DateTime.Now;
 
-            CurrentDebugFile = Path.Combine(DebugFolderPath, string.Concat(now.GetHashCode(), ".txt"));
+            CurrentDebugFile = Path.Combine(DebugFolderPath, string.Concat(now.ToString("yyyy-MM-dd_HH-mm-ss-ff"), ".txt"));
             File.WriteAllText(CurrentDebugFile, string.Concat("Debug file: ", now.ToString()));
         }
 
+        public static void Write(object message) => Write(message.ToString());
         public static void Write(string message)
         {
             if (string.IsNullOrEmpty(CurrentDebugFile)) { CreateNewDebugFile(); }

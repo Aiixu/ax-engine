@@ -14,7 +14,7 @@ namespace Ax.Engine.ECS
         private static readonly List<Entity> entities = new List<Entity>();
         private static readonly Dictionary<Type, List<Entity>> componentsRegistry = new Dictionary<Type, List<Entity>>();
 
-        private static bool registryEnabled;
+        private static bool registryEnabled = false;
 
         public static void Update()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Ax.Engine.Core;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
@@ -21,11 +22,10 @@ namespace Ax.Engine
 
             game.OpenDevMenu = true;
 
-            Logger.Write("test");
-            Logger.Write("test");
-
             CameraComponent camera = EntityManager.AddEntity().AddComponent<CameraComponent>();
-            
+
+            Logger.Write(camera.Entity.HasComponent<CameraComponent>());
+
             while (game.IsRunning)
             {
                 game.HandleEvents();

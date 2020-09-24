@@ -15,7 +15,7 @@ namespace Ax.Engine.ECS
         internal Dictionary<Type, bool> ComponentsRegistry { get; } = new Dictionary<Type, bool>();
         internal List<Component> Components { get; } = new List<Component>(MAX_COMPONENTS_COUNT);
 
-        public bool IsActive { get; private set; }
+        public bool IsActive { get; private set; } = true;
         public int ReferenceId { get; internal set; }
 
         public void Update()
