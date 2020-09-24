@@ -14,10 +14,11 @@ namespace Ax.Engine
         {
             game = new GameBuilder()
                 .SetTitle("Engine demo")
-                .SetFont("Lucidas Console", 22, 22)
+                .SetFont("Lucidas Console", 16, 16)
                 .SetSize(60, 40)
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
+                .LimitFrameDelay(70)
                 .Build();
 
             game.OpenDevMenu = true;
@@ -26,7 +27,7 @@ namespace Ax.Engine
 
             AnimatedSpriteComponent animatedCharacter = EntityManager.AddEntity().AddComponent<AnimatedSpriteComponent>();
             animatedCharacter.ImportSheet("assets/character-new", new Vector2Int(40, 40));
-            animatedCharacter.animationDelay = 80;
+            animatedCharacter.animationDelay = 70;
             animatedCharacter.Transform.position = new Vector2(5, 0);
 
             while (game.IsRunning)

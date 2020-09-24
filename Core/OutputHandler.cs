@@ -35,6 +35,9 @@ namespace Ax.Engine.Core
 
         private Encoding consoleEncoding;
 
+        private DateTime lastFrameRendered;
+        private int frameDelay;
+
         private IntPtr hOut;
         private CONSOLE_MODE_OUTPUT outLast;
 
@@ -46,7 +49,7 @@ namespace Ax.Engine.Core
         private Stopwatch globalStopwatch;
 
         // TODO : fontHeight
-        public bool Enable(string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn = false)
+        public bool Enable(string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn, int frameDelay)
         {
             if (!GetStdOut(out hOut)) { return false; }
             if (!GetConsoleModeIn(HOUT, out outLast)) { return false; }
@@ -80,11 +83,24 @@ namespace Ax.Engine.Core
             writeStopwatch = new Stopwatch();
             globalStopwatch = new Stopwatch();
 
+            this.frameDelay = frameDelay;
+
             consoleEncoding = Console.Out.Encoding;
 
             Console.CursorVisible = cursorVisible;
 
             return SetConsoleMode(HOUT, (uint)mode);
+        }
+
+        public bool CanRender()
+        {
+            if ((DateTime.Now - lastFrameRendered).TotalMilliseconds >= frameDelay)
+            {
+                lastFrameRendered = DateTime.Now;
+                return true;
+            }
+
+            return false;
         }
 
         public bool Disable()

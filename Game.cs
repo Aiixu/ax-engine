@@ -61,6 +61,7 @@ namespace Ax.Engine
         public void Render()
         {
             if (!IsRunning) { return; }
+            if (!OutputHandler.CanRender()) { return; }
 
             OutputHandler.PrepareSurface(Console.BufferWidth, Console.BufferHeight);
 
