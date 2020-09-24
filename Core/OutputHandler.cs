@@ -217,10 +217,10 @@ namespace Ax.Engine.Core
 
             LastFrameData = new RenderData()
             {
-                CalculationTime = calculationStopwatch.ElapsedMilliseconds,
-                ReleaseTime = releaseStopwatch.ElapsedMilliseconds,
-                WriteTime = writeStopwatch.ElapsedMilliseconds,
-                GlobalTime = globalStopwatch.ElapsedMilliseconds
+                CalculationTime = calculationStopwatch.Elapsed,
+                ReleaseTime = releaseStopwatch.Elapsed,
+                WriteTime = writeStopwatch.Elapsed,
+                GlobalTime = globalStopwatch.Elapsed,
             };
 
             return written;
@@ -271,10 +271,10 @@ namespace Ax.Engine.Core
         
         public struct RenderData
         {
-            public long CalculationTime { get; internal set; } 
-            public long ReleaseTime { get; internal set; }
-            public long WriteTime { get; internal set; }
-            public long GlobalTime { get; internal set; }
+            public TimeSpan CalculationTime { get; internal set; } 
+            public TimeSpan ReleaseTime { get; internal set; }
+            public TimeSpan WriteTime { get; internal set; }
+            public TimeSpan GlobalTime { get; internal set; }
         }
     }
 }

@@ -73,12 +73,12 @@ namespace Ax.Engine
                 string rele = lastFrame.ReleaseTime.ToString();
                 string writ = lastFrame.WriteTime.ToString();
 
-                OutputHandler.RenderStr(0, 0, int.MaxValue, "┌────────────┐", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 1, int.MaxValue, "│GLOB        │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 2, int.MaxValue, "│CALC        │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 3, int.MaxValue, "│RELE        │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 4, int.MaxValue, "│WRIT        │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 5, int.MaxValue, "└────────────┘", Color.White, Color.Black, true);
+                OutputHandler.RenderStr(0, 0, int.MaxValue, "┌─────────────────────┐", Color.White, Color.Black, true);
+                OutputHandler.RenderStr(0, 1, int.MaxValue, "│GLOB                 │", Color.White, Color.Black, true);
+                OutputHandler.RenderStr(0, 2, int.MaxValue, "│CALC                 │", Color.White, Color.Black, true);
+                OutputHandler.RenderStr(0, 3, int.MaxValue, "│RELE                 │", Color.White, Color.Black, true);
+                OutputHandler.RenderStr(0, 4, int.MaxValue, "│WRIT                 │", Color.White, Color.Black, true);
+                OutputHandler.RenderStr(0, 5, int.MaxValue, "└─────────────────────┘", Color.White, Color.Black, true);
 
                 OutputHandler.RenderStr(6, 1, int.MaxValue, glob, Color.White, Color.Black, true);
                 OutputHandler.RenderStr(6, 2, int.MaxValue, calc, Color.White, Color.Black, true);
