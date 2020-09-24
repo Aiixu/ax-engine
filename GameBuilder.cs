@@ -1,7 +1,7 @@
-﻿using System;
-using Ax.Engine.ECS;
+﻿using System.Threading;
+using System;
+
 using Ax.Engine.Core;
-using System.Threading;
 
 using static Ax.Engine.Core.Native;
 using static Ax.Engine.Utils.DefaultValue;
@@ -10,12 +10,13 @@ namespace Ax.Engine
 {
     public sealed class GameBuilder
     {
-        // private/indexer to be able to use ref
         public string WindowName;
         public int WindowWidth;
         public int WindowHeight;
         public int WindowLeft;
         public int WindowTop;
+
+        public string DebugFolderPath;
 
         public string FontName;
         public int FontWidth;
@@ -67,6 +68,13 @@ namespace Ax.Engine
             return this;
         }
 
+        public GameBuilder Debug(string debugFolderPath)
+        {
+            DebugFolderPath = debugFolderPath;
+
+            return this;
+        }
+
         public Game Build(bool disableNewLineAutoReturn = false, uint flags = 0)
         {
             Default(ref WindowName, StringNotNullOrEmpty, Console.Title);
@@ -74,6 +82,7 @@ namespace Ax.Engine
             Default(ref WindowHeight,IntegerPositive, Console.WindowHeight);
             Default(ref WindowLeft, IntegerPositiveOrZero, Console.WindowLeft);
             Default(ref WindowTop, IntegerPositiveOrZero, Console.WindowTop);
+            Default(ref DebugFolderPath, StringNotNullOrEmpty, "logs");
 
             bool isRunning = true;
 
@@ -92,6 +101,8 @@ namespace Ax.Engine
 
             isRunning &= inputHandler.Enable();
             isRunning &= outputHandler.Enable(FontName, FontWidth, FontHeight, CursorVisible, disableNewLineAutoReturn);
+
+            Logger.DebugFolderPath = DebugFolderPath;
 
             Console.SetWindowSize(WindowWidth, WindowHeight);
             Console.SetBufferSize(WindowWidth, WindowHeight);

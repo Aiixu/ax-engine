@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Collisions.cs" />
+    <Compile Include="Core\Logger.cs" />
     <Compile Include="Core\InputHandler.cs" />
     <Compile Include="Core\Enums\NativeConsoleEvents.cs" />
     <Compile Include="Core\Enums\NativeConsoleModeInput.cs" />

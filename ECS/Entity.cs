@@ -49,7 +49,7 @@ namespace Ax.Engine.ECS
         {
             Type typeofT = typeof(T);
 
-            if (!ComponentsRegistry[typeofT])
+            if (!ComponentsRegistry.ContainsKey(typeofT))
             {
                 EntityManager.RegisterAddEntityComponent(typeofT, this);
             }
