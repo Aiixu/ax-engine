@@ -4,6 +4,7 @@ using Ax.Engine.Core;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
+using System.Threading;
 
 namespace Ax.Engine
 {
@@ -61,40 +62,43 @@ namespace Ax.Engine
         public void Render()
         {
             if (!IsRunning) { return; }
+            if (OutputHandler.CanPrepareSurface())
+            {
+                OutputHandler.PrepareSurface(Console.BufferWidth, Console.BufferHeight);
+
+                if (OpenDevMenu)
+                {
+                    OutputHandler.RenderData lastFrame = OutputHandler.LastFrameData;
+
+                    string glob = lastFrame.GlobalTime.ToString();
+                    string calc = lastFrame.CalculationTime.ToString();
+                    string rele = lastFrame.ReleaseTime.ToString();
+                    string writ = lastFrame.WriteTime.ToString();
+
+                    OutputHandler.RenderStr(0, 0, int.MaxValue, "┌─────────────────────┐", Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(0, 1, int.MaxValue, "│GLOB                 │", Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(0, 2, int.MaxValue, "│CALC                 │", Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(0, 3, int.MaxValue, "│RELE                 │", Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(0, 4, int.MaxValue, "│WRIT                 │", Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(0, 5, int.MaxValue, "└─────────────────────┘", Color.White, Color.Black, true);
+
+                    OutputHandler.RenderStr(6, 1, int.MaxValue, glob, Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(6, 2, int.MaxValue, calc, Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(6, 3, int.MaxValue, rele, Color.White, Color.Black, true);
+                    OutputHandler.RenderStr(6, 4, int.MaxValue, writ, Color.White, Color.Black, true);
+                }
+
+                if (!EntityManager.EntityExistsWithComponent<CameraComponent>())
+                {
+                    OutputHandler.RenderStr(Console.WindowWidth / 2 - 9, MathHelper.FloorToInt(Console.WindowHeight / 2f) - 1, int.MaxValue, "NO CAMERA RENDERING", Color.White, Color.Black, true);
+                }
+                else
+                {
+                    EntityManager.Render(OutputHandler);
+                }
+            }
+
             if (!OutputHandler.CanRender()) { return; }
-
-            OutputHandler.PrepareSurface(Console.BufferWidth, Console.BufferHeight);
-
-            if (OpenDevMenu)
-            {
-                OutputHandler.RenderData lastFrame = OutputHandler.LastFrameData;
-
-                string glob = lastFrame.GlobalTime.ToString();
-                string calc = lastFrame.CalculationTime.ToString();
-                string rele = lastFrame.ReleaseTime.ToString();
-                string writ = lastFrame.WriteTime.ToString();
-
-                OutputHandler.RenderStr(0, 0, int.MaxValue, "┌─────────────────────┐", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 1, int.MaxValue, "│GLOB                 │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 2, int.MaxValue, "│CALC                 │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 3, int.MaxValue, "│RELE                 │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 4, int.MaxValue, "│WRIT                 │", Color.White, Color.Black, true);
-                OutputHandler.RenderStr(0, 5, int.MaxValue, "└─────────────────────┘", Color.White, Color.Black, true);
-
-                OutputHandler.RenderStr(6, 1, int.MaxValue, glob, Color.White, Color.Black, true);
-                OutputHandler.RenderStr(6, 2, int.MaxValue, calc, Color.White, Color.Black, true);
-                OutputHandler.RenderStr(6, 3, int.MaxValue, rele, Color.White, Color.Black, true);
-                OutputHandler.RenderStr(6, 4, int.MaxValue, writ, Color.White, Color.Black, true);
-            }
-
-            if (!EntityManager.EntityExistsWithComponent<CameraComponent>())
-            {
-                OutputHandler.RenderStr(Console.WindowWidth / 2 - 9, MathHelper.FloorToInt(Console.WindowHeight / 2f) - 1, int.MaxValue, "NO CAMERA RENDERING", Color.White, Color.Black, true);
-            }
-            else
-            {
-                EntityManager.Render(OutputHandler);
-            }
 
             OutputHandler.ReleaseSurface();
         }

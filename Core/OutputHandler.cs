@@ -38,6 +38,8 @@ namespace Ax.Engine.Core
         private DateTime lastFrameRendered;
         private int frameDelay;
 
+        private bool canPrepareSurface = true;
+
         private IntPtr hOut;
         private CONSOLE_MODE_OUTPUT outLast;
 
@@ -103,6 +105,11 @@ namespace Ax.Engine.Core
             return false;
         }
 
+        public bool CanPrepareSurface()
+        {
+            return canPrepareSurface;
+        }
+
         public bool Disable()
         {
             hOut = IntPtr.Zero;
@@ -119,6 +126,8 @@ namespace Ax.Engine.Core
 
         public void PrepareSurface(int width, int height)
         {
+            canPrepareSurface = false;
+
             calculationStopwatch.Reset();
             releaseStopwatch.Reset();
             writeStopwatch.Reset();
@@ -238,6 +247,8 @@ namespace Ax.Engine.Core
                 WriteTime = writeStopwatch.Elapsed,
                 GlobalTime = globalStopwatch.Elapsed,
             };
+
+            canPrepareSurface = true;
 
             return written;
         }

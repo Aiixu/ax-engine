@@ -18,7 +18,7 @@ namespace Ax.Engine
                 .SetSize(60, 40)
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
-                .LimitFrameDelay(70)
+                .LimitFrameDelay(75)
                 .Build();
 
             game.OpenDevMenu = true;
@@ -27,7 +27,7 @@ namespace Ax.Engine
 
             AnimatedSpriteComponent animatedCharacter = EntityManager.AddEntity().AddComponent<AnimatedSpriteComponent>();
             animatedCharacter.ImportSheet("assets/character-new", new Vector2Int(40, 40));
-            animatedCharacter.animationDelay = 70;
+            animatedCharacter.animationDelay = 0;
             animatedCharacter.Transform.position = new Vector2(5, 0);
 
             while (game.IsRunning)
