@@ -145,7 +145,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>del -q -f -s "ax-engine.pdb"
-del -q -f -s "ax-engine.exe.config"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>del -q -f -s "ax-engine.pdb"
+del -q -f -s "ax-engine.exe.config"</PostBuildEvent>
   </PropertyGroup>
 </Project>
