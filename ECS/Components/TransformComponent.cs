@@ -2,6 +2,7 @@
 
 namespace Ax.Engine.ECS.Components
 {
+    [UniqueComponent]
     public sealed class TransformComponent : Component
     {
         public Vector2 position = Vector2.Zero;

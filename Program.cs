@@ -14,7 +14,7 @@ namespace Ax.Engine
         {
             game = new GameBuilder()
                 .SetTitle("Engine demo")
-                .SetFont("Lucidas Console", 16, 16)
+                .SetFont("Lucidas Console", 8, 16)
                 .SetSize(60, 40)
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
@@ -22,6 +22,8 @@ namespace Ax.Engine
                 .Build();
 
             game.OpenDevMenu = true;
+
+            EntityManager.EnableRegistry(false);
 
             CameraComponent camera = EntityManager.AddEntity().AddComponent<CameraComponent>();
 

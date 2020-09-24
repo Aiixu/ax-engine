@@ -2,6 +2,7 @@
 
 namespace Ax.Engine.ECS.Components
 {
+    [UniqueComponent]
     public sealed class CameraComponent : Component
     {
         public Vector2 Rect;

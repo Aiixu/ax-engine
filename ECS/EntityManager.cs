@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using Ax.Engine.Core;
 using Ax.Engine.ECS.Components;
+using System.Diagnostics;
 
 namespace Ax.Engine.ECS
 {
@@ -73,9 +74,9 @@ namespace Ax.Engine.ECS
 
                     for (int j = 0; j < entity.Components.Count; j++)
                     {
-                        Type componentType = entity.Components[i].GetType();
+                        Type componentType = entity.Components[j].GetType();
 
-                        if(!componentsRegistry.ContainsKey(componentType))
+                        if (!componentsRegistry.ContainsKey(componentType))
                         {
                             componentsRegistry.Add(componentType, new List<Entity>());
                         }
