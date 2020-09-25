@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Ax.Engine.Utils
 {
-    public struct Color
+    public struct Color : IEquatable<Color>
     {
         public byte r;
         public byte g;
@@ -42,7 +42,7 @@ namespace Ax.Engine.Utils
 
         public override string ToString()
         {
-            return base.ToString();
+            return $"(R:{r},G:{g},B:{b})";
         }
 
         public static Color Black => new Color(0, 0, 0);
@@ -64,6 +64,11 @@ namespace Ax.Engine.Utils
             byte b = byte.Parse(hex.Substring(4, 2), NumberStyles.AllowHexSpecifier);
 
             return FromRgb(r, g, b);
+        }
+
+        public bool Equals(Color other)
+        {
+            return r == other.r && g == other.g && b == other.b;
         }
     }
 }

@@ -54,18 +54,18 @@ namespace Ax.Engine.ECS.Components
 
         public override void Update()
         {
+            if ((DateTime.Now - lastFrameRendered).TotalMilliseconds >= animationDelay)
+            {
+                currentFrame = (currentFrame + 1) % frames.Length;
+                lastFrameRendered = DateTime.Now;
+            }
+
             destRect.position = (Vector2Int)Transform.position;
             destRect.size = (Vector2Int)((Vector2)sourceRect.size * Transform.scale);
         }
 
         public override void Render(OutputHandler outputHandler)
         {
-            if((DateTime.Now - lastFrameRendered).TotalMilliseconds >= animationDelay)
-            {
-                currentFrame = (currentFrame + 1) % frames.Length;
-                lastFrameRendered = DateTime.Now;
-            }
-
             Bitmap frame = frames[currentFrame];
             for (int y = 0; y < frame.Height; y++)
             {

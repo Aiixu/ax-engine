@@ -18,13 +18,22 @@ namespace Ax.Engine
 
         public string DebugFolderPath;
 
-        public int FrameDelay;
+        public int FPS;
 
         public string FontName;
         public int FontWidth;
         public int FontHeight;
 
-        public bool CursorVisible { get; set; } = false;
+        public bool CursorVisible = false;
+
+        public OutputHandler.RenderingMode RenderingMode;
+
+        public GameBuilder SetRenderingMode(OutputHandler.RenderingMode renderingMode)
+        {
+            RenderingMode = renderingMode;
+
+            return this;
+        }
 
         public GameBuilder SetTitle(string windowName)
         {
@@ -77,9 +86,9 @@ namespace Ax.Engine
             return this;
         }
 
-        public GameBuilder LimitFrameDelay(int frameDelay)
+        public GameBuilder LimitFPS(int fps)
         {
-            FrameDelay = frameDelay;
+            FPS = fps;
 
             return this;
         }
@@ -109,7 +118,7 @@ namespace Ax.Engine
             isRunning &= SetConsoleTitle(WindowName);
 
             isRunning &= inputHandler.Enable();
-            isRunning &= outputHandler.Enable(FontName, FontWidth, FontHeight, CursorVisible, disableNewLineAutoReturn, FrameDelay);
+            isRunning &= outputHandler.Enable(RenderingMode, FontName, FontWidth, FontHeight, CursorVisible, disableNewLineAutoReturn, 1000 / FPS);
 
             Logger.DebugFolderPath = DebugFolderPath;
 

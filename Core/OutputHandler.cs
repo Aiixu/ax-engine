@@ -8,15 +8,24 @@ using Ax.Engine.Utils;
 
 using static Ax.Engine.Core.Native;
 using static Ax.Engine.Utils.DefaultValue;
+using System.Threading;
 
 namespace Ax.Engine.Core
 {
     public sealed class OutputHandler
     {
+        public enum RenderingMode
+        {
+            FullChar,
+            HalfChar
+        }
+
         public const string ESC = "\x1b";
         public const string BEL = "\x07";
         public const string SUB = "\x1a";
         public const string DEL = "\x7f";
+
+        public const string BL_BRIGHTNESS_TABLE = "█▓▒░ ";
 
         public static string GetColorBackgroundString(Color c) => GetColorBackgroundString(c.r, c.g, c.b);
         public static string GetColorForegroundString(Color c) => GetColorForegroundString(c.r, c.g, c.b);
@@ -38,7 +47,7 @@ namespace Ax.Engine.Core
         private DateTime lastFrameRendered;
         private int frameDelay;
 
-        private bool canPrepareSurface = true;
+        private RenderingMode renderingMode;
 
         private IntPtr hOut;
         private CONSOLE_MODE_OUTPUT outLast;
@@ -51,7 +60,7 @@ namespace Ax.Engine.Core
         private Stopwatch globalStopwatch;
 
         // TODO : fontHeight
-        public bool Enable(string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn, int frameDelay)
+        public bool Enable(RenderingMode renderingMode, string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn, int frameDelay)
         {
             if (!GetStdOut(out hOut)) { return false; }
             if (!GetConsoleModeIn(HOUT, out outLast)) { return false; }
@@ -85,6 +94,7 @@ namespace Ax.Engine.Core
             writeStopwatch = new Stopwatch();
             globalStopwatch = new Stopwatch();
 
+            this.renderingMode = renderingMode;
             this.frameDelay = frameDelay;
 
             consoleEncoding = Console.Out.Encoding;
@@ -94,20 +104,16 @@ namespace Ax.Engine.Core
             return SetConsoleMode(HOUT, (uint)mode);
         }
 
-        public bool CanRender()
+        public void WaitFrame()
         {
             if ((DateTime.Now - lastFrameRendered).TotalMilliseconds >= frameDelay)
             {
                 lastFrameRendered = DateTime.Now;
-                return true;
             }
-
-            return false;
-        }
-
-        public bool CanPrepareSurface()
-        {
-            return canPrepareSurface;
+            else
+            {
+                Thread.Sleep((int)(frameDelay - (DateTime.Now - lastFrameRendered).TotalMilliseconds));
+            }
         }
 
         public bool Disable()
@@ -135,13 +141,26 @@ namespace Ax.Engine.Core
 
             globalStopwatch.Start();
 
-            surface = new SurfaceItem[width, height];
-            surfaceSet = new bool[width, height];
+            switch(renderingMode)
+            {
+                case RenderingMode.FullChar:
+                    surface = new SurfaceItem[width, height];
+                    surfaceSet = new bool[width, height];
+                    break;
+
+                case RenderingMode.HalfChar:
+                    surface = new SurfaceItem[width, MathHelper.CeilToInt(height / 2f)];
+                    surfaceSet = new bool[width, MathHelper.CeilToInt(height / 2f)];
+                    break;
+            }
         }
 
-        //public bool Render(int x, int y, char ch) => Render(x, y, ch, ); ---- render default fg bg
-        public bool RenderCh(int x, int y, int z, char ch, Color fg, Color bg, bool forced = false) => RenderCh(x, y, z, ch, fg.r, fg.g, fg.b, bg.r, bg.g, bg.b, forced);
         public bool RenderCh(int x, int y, int z, char ch, byte fgr, byte fgg, byte fgb, byte bgr, byte bgg, byte bgb, bool forced = false)
+        {
+            return RenderCh(x, y, z, ch, new Color(fgr, fgg, fgb), new Color(bgr, bgg, bgb), forced);
+        }
+
+        public bool RenderCh(int x, int y, int z, char ch, Color fg, Color bg, bool forced = false)
         {
             bool ProcessRenderInternal()
             {
@@ -150,12 +169,8 @@ namespace Ax.Engine.Core
                 {
                     SurfaceItem surfaceItem = new SurfaceItem
                     {
-                        fgr = fgr,
-                        fgg = fgg,
-                        fgb = fgb,
-                        bgr = bgr,
-                        bgg = bgg,
-                        bgb = bgb,
+                        fg = fg,
+                        bg = bg,
                         ch = ch,
                         z = z
                     };
@@ -196,40 +211,64 @@ namespace Ax.Engine.Core
             releaseStopwatch.Start();
             StringBuilder bytesBuilder = new StringBuilder();
 
-            bool lastPixelIsBackground = true;
+            /*int size = surface.Length;
+            SurfaceItem[] flattenSurface = new SurfaceItem[size];
+            List<SurfaceItem> optimizedSurface = new List<SurfaceItem>(size);
 
-            for (int y = 0; y < surfaceSet.GetLength(1); y++)
+            int write = 0;
+            for (int x = 0; x <= surface.GetUpperBound(0); x++)
             {
-                for (int x = 0; x < surfaceSet.GetLength(0); x++)
+                for (int y = 0; y <= surface.GetUpperBound(1); y++)
                 {
-                    if(surfaceSet[x, y])
-                    {
-                        SurfaceItem surfaceItem = surface[x, y];
-
-                        string bg = GetColorBackgroundString(surfaceItem.bgr, surfaceItem.bgg, surfaceItem.bgb);
-                        string fg = GetColorForegroundString(surfaceItem.fgr, surfaceItem.fgg, surfaceItem.fgb);
-
-                        bytesBuilder.Append(bg);
-                        bytesBuilder.Append(fg);
-                        bytesBuilder.Append(surfaceItem.ch);
-
-                        lastPixelIsBackground = false;
-                    }
-                    else
-                    {
-                        if(!lastPixelIsBackground)
-                        {
-                            string bg = GetColorBackgroundString(0, 0, 0);
-                            bytesBuilder.Append(bg);
-
-                            lastPixelIsBackground = true;
-                        }
-
-                        bytesBuilder.Append(' ');
-                    }
+                    flattenSurface[write++] = surface[x, y];
                 }
             }
+            */
 
+            switch(renderingMode)
+            {
+                case RenderingMode.FullChar:
+                    {
+                        Color lastBackground;
+                        Color lastForeground;
+                        char lastChar;
+
+                        bool lastPixelIsBackground = true;
+
+                        for (int y = 0; y < surfaceSet.GetLength(1); y++)
+                        {
+                            for (int x = 0; x < surfaceSet.GetLength(0); x++)
+                            {
+                                if (surfaceSet[x, y])
+                                {
+                                    SurfaceItem surfaceItem = surface[x, y];
+
+                                    string bg = GetColorBackgroundString(surfaceItem.bg.r, surfaceItem.bg.g, surfaceItem.bg.b);
+                                    string fg = GetColorForegroundString(surfaceItem.fg.r, surfaceItem.fg.g, surfaceItem.fg.b);
+
+                                    bytesBuilder.Append(bg);
+                                    bytesBuilder.Append(fg);
+                                    bytesBuilder.Append(surfaceItem.ch);
+
+                                    lastPixelIsBackground = false;
+                                }
+                                else
+                                {
+                                    if (!lastPixelIsBackground)
+                                    {
+                                        string bg = GetColorBackgroundString(0, 0, 0);
+                                        bytesBuilder.Append(bg);
+
+                                        lastPixelIsBackground = true;
+                                    }
+
+                                    bytesBuilder.Append(' ');
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
             releaseStopwatch.Stop();
             
             writeStopwatch.Start();
@@ -273,26 +312,15 @@ namespace Ax.Engine.Core
 
         public struct SurfaceItem : IEquatable<SurfaceItem>
         {
-            public byte fgr;
-            public byte fgg;
-            public byte fgb;
-            public byte bgr;
-            public byte bgg;
-            public byte bgb;
+            public Color fg;
+            public Color bg;
 
             public char ch;
             public int z;
 
             public bool Equals(SurfaceItem other)
             {
-                return fgr == other.fgr &&
-                       fgg == other.fgg &&
-                       fgb == other.fgb &&
-                       bgr == other.bgr &&
-                       bgg == other.bgg &&
-                       bgb == other.bgb &&
-                       ch == other.ch &&
-                       z == other.z;
+                return fg.Equals(other.fg) && bg.Equals(other.bg) && ch == other.ch && z == other.z;
             }
         }
         
