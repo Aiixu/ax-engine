@@ -4,6 +4,7 @@ using Ax.Engine.Core;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
+using System.Text;
 
 namespace Ax.Engine
 {
@@ -20,7 +21,7 @@ namespace Ax.Engine
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
                 .LimitFPS(11)
-                .SetRenderingMode(OutputHandler.RenderingMode.FullChar)
+                .SetRenderingMode(OutputHandler.RenderingMode.ColorOnly)
                 .Build();
 
             game.OpenDevMenu = true;

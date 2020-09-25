@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Linq;
+using System.Threading;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -8,7 +9,8 @@ using Ax.Engine.Utils;
 
 using static Ax.Engine.Core.Native;
 using static Ax.Engine.Utils.DefaultValue;
-using System.Threading;
+using System.Net.NetworkInformation;
+using System.Collections.Generic;
 
 namespace Ax.Engine.Core
 {
@@ -16,8 +18,9 @@ namespace Ax.Engine.Core
     {
         public enum RenderingMode
         {
+            ColorOnly,
+            ColorOnlyHalfChar,
             FullChar,
-            HalfChar
         }
 
         public const string ESC = "\x1b";
@@ -39,15 +42,15 @@ namespace Ax.Engine.Core
 
         public RenderData LastFrameData { get; private set; }
 
-        internal SurfaceItem[,] surface;
-        internal bool[,] surfaceSet;
+        private SurfaceItem[,] surface;
+        private bool[,] surfaceSet;
 
         private Encoding consoleEncoding;
 
         private DateTime lastFrameRendered;
         private int frameDelay;
 
-        private RenderingMode renderingMode;
+        private static RenderingMode renderingMode;
 
         private IntPtr hOut;
         private CONSOLE_MODE_OUTPUT outLast;
@@ -58,6 +61,8 @@ namespace Ax.Engine.Core
         private Stopwatch releaseStopwatch;
         private Stopwatch writeStopwatch;
         private Stopwatch globalStopwatch;
+
+        public static Color ClearColor = Color.Black;
 
         // TODO : fontHeight
         public bool Enable(RenderingMode renderingMode, string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn, int frameDelay)
@@ -94,11 +99,11 @@ namespace Ax.Engine.Core
             writeStopwatch = new Stopwatch();
             globalStopwatch = new Stopwatch();
 
-            this.renderingMode = renderingMode;
             this.frameDelay = frameDelay;
 
             consoleEncoding = Console.Out.Encoding;
 
+            OutputHandler.renderingMode = renderingMode;
             Console.CursorVisible = cursorVisible;
 
             return SetConsoleMode(HOUT, (uint)mode);
@@ -132,7 +137,7 @@ namespace Ax.Engine.Core
 
         public void PrepareSurface(int width, int height)
         {
-            canPrepareSurface = false;
+            // canPrepareSurface = false;
 
             calculationStopwatch.Reset();
             releaseStopwatch.Reset();
@@ -143,37 +148,49 @@ namespace Ax.Engine.Core
 
             switch(renderingMode)
             {
+                case RenderingMode.ColorOnly:
                 case RenderingMode.FullChar:
                     surface = new SurfaceItem[width, height];
                     surfaceSet = new bool[width, height];
                     break;
 
-                case RenderingMode.HalfChar:
+                case RenderingMode.ColorOnlyHalfChar:
                     surface = new SurfaceItem[width, MathHelper.CeilToInt(height / 2f)];
                     surfaceSet = new bool[width, MathHelper.CeilToInt(height / 2f)];
                     break;
             }
         }
 
-        public bool RenderCh(int x, int y, int z, char ch, byte fgr, byte fgg, byte fgb, byte bgr, byte bgg, byte bgb, bool forced = false)
+        internal bool RenderCh(int x, int y, int z, char ch, byte fgr, byte fgg, byte fgb, byte bgr, byte bgg, byte bgb, bool forced = false)
         {
             return RenderCh(x, y, z, ch, new Color(fgr, fgg, fgb), new Color(bgr, bgg, bgb), forced);
         }
 
-        public bool RenderCh(int x, int y, int z, char ch, Color fg, Color bg, bool forced = false)
+        internal bool RenderCh(int x, int y, int z, char ch, Color fg, Color bg = null, bool forced = false)
         {
             bool ProcessRenderInternal()
             {
                 // z == int.MaxValue > dev tools
                 if (forced || !surfaceSet[x, y] || (surfaceSet[x, y] && surface[x, y].z >= z && surface[x, y].z != int.MaxValue))
                 {
-                    SurfaceItem surfaceItem = new SurfaceItem
+                    SurfaceItem surfaceItem = new SurfaceItem()
                     {
-                        fg = fg,
-                        bg = bg,
-                        ch = ch,
                         z = z
                     };
+
+                    switch(renderingMode)
+                    {
+                        case RenderingMode.ColorOnly:
+                        case RenderingMode.ColorOnlyHalfChar:
+                            surfaceItem.color = bg;
+                            break;
+
+                        case RenderingMode.FullChar:
+                            surfaceItem.bg = bg;
+                            surfaceItem.fg = fg;
+                            surfaceItem.ch = ch;
+                            break;
+                    }
 
                     if (surface[x, y].Equals(surfaceItem)) { return false; }
 
@@ -193,14 +210,14 @@ namespace Ax.Engine.Core
             return result;
         }
 
-        public bool[] RenderStr(int x, int y, int z, string str, Color fg, Color bg, bool forced = false) => RenderStr(x, y, z, str, fg.r, fg.g, fg.b, bg.r, bg.g, bg.b, forced);
-        public bool[] RenderStr(int x, int y, int z, string str, byte fgr, byte fgg, byte fgb, byte bgr, byte bgg, byte bgb, bool forced = false)
+        internal bool[] RenderStr(int x, int y, int z, string str, byte fgr, byte fgg, byte fgb, byte bgr, byte bgg, byte bgb, bool forced = false) => RenderStr(x, y, z, str, new Color(fgr, fgg, fgb), new Color(bgr, bgg, bgb), forced);
+        internal bool[] RenderStr(int x, int y, int z, string str, Color fg, Color bg = null, bool forced = false)
         {
             bool[] results = new bool[str.Length];
 
             for (int i = 0; i < str.Length; i++)
             {
-                results[i] = RenderCh(x + i, y, z, str[i], fgr, fgg, fgb, bgr, bgg, bgb, forced);
+                results[i] = RenderCh(x + i, y, z, str[i], fg, bg, forced);
             }
 
             return results;
@@ -222,42 +239,55 @@ namespace Ax.Engine.Core
                 {
                     flattenSurface[write++] = surface[x, y];
                 }
-            }
-            */
+            }*/
 
             switch(renderingMode)
             {
-                case RenderingMode.FullChar:
+                case RenderingMode.ColorOnly:
                     {
-                        Color lastBackground;
-                        Color lastForeground;
+                        Color lastBackground = null;
+                        Color lastForeground = null;
                         char lastChar;
 
                         bool lastPixelIsBackground = true;
+                        List<string> builder = new List<string>();
 
                         for (int y = 0; y < surfaceSet.GetLength(1); y++)
                         {
                             for (int x = 0; x < surfaceSet.GetLength(0); x++)
                             {
+                                SurfaceItem surfaceItem = surface[x, y];
+
+                                if(lastBackground == surfaceItem.color)
+                                {
+                                    builder[builder.Count - 1] += ' ';
+                                    continue;
+                                }
+                                else if(lastForeground == surfaceItem.color)
+                                {
+                                    builder[builder.Count - 1] += '█';
+                                    continue;
+                                }
+
+                                string bg = GetColorBackgroundString(surfaceItem.bg.r, surfaceItem.bg.g, surfaceItem.bg.b);
+                                string fg = GetColorForegroundString(surfaceItem.fg.r, surfaceItem.fg.g, surfaceItem.fg.b);
+
+                                bytesBuilder.Append(bg);
+                                bytesBuilder.Append(fg);
+                                bytesBuilder.Append(surfaceItem.ch == '\0' ? ' ' : surfaceItem.ch);
+
+                                lastPixelIsBackground = false;
+                                continue;
                                 if (surfaceSet[x, y])
                                 {
-                                    SurfaceItem surfaceItem = surface[x, y];
-
-                                    string bg = GetColorBackgroundString(surfaceItem.bg.r, surfaceItem.bg.g, surfaceItem.bg.b);
-                                    string fg = GetColorForegroundString(surfaceItem.fg.r, surfaceItem.fg.g, surfaceItem.fg.b);
-
-                                    bytesBuilder.Append(bg);
-                                    bytesBuilder.Append(fg);
-                                    bytesBuilder.Append(surfaceItem.ch);
-
-                                    lastPixelIsBackground = false;
+                                    
                                 }
                                 else
                                 {
                                     if (!lastPixelIsBackground)
                                     {
-                                        string bg = GetColorBackgroundString(0, 0, 0);
-                                        bytesBuilder.Append(bg);
+                                        //string bg = GetColorBackgroundString(0, 0, 0);
+                                        //bytesBuilder.Append(bg);
 
                                         lastPixelIsBackground = true;
                                     }
@@ -287,9 +317,9 @@ namespace Ax.Engine.Core
                 GlobalTime = globalStopwatch.Elapsed,
             };
 
-            canPrepareSurface = true;
+            // canPrepareSurface = true;
 
-            return written;
+            return 0; //written
         }
 
         private bool GetStdOut(out IntPtr handle)
@@ -310,17 +340,33 @@ namespace Ax.Engine.Core
             return true;
         }
 
-        public struct SurfaceItem : IEquatable<SurfaceItem>
+        private class SurfaceItem : IEquatable<SurfaceItem>
         {
+            // RenderingMode.ColorOnly
+            public Color color;
+
+            // RenderingMode.FullChar
             public Color fg;
             public Color bg;
-
             public char ch;
+
+            // Global
             public int z;
 
             public bool Equals(SurfaceItem other)
             {
-                return fg.Equals(other.fg) && bg.Equals(other.bg) && ch == other.ch && z == other.z;
+                switch(renderingMode)
+                {
+                    case RenderingMode.ColorOnly:
+                    case RenderingMode.ColorOnlyHalfChar:
+                        return color.Equals(other.color);
+
+                    case RenderingMode.FullChar:
+                        return fg.Equals(other.fg) && bg.Equals(other.bg) && ch == other.ch && z == other.z;
+
+                    default:
+                        throw new Exception("Unreachable");
+                }
             }
         }
         

@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Ax.Engine.Utils
 {
-    public struct Color : IEquatable<Color>
+    public class Color : IEquatable<Color>
     {
         public byte r;
         public byte g;
