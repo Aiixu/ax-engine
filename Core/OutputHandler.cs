@@ -192,7 +192,7 @@ namespace Ax.Engine.Core
                             break;
                     }
 
-                    if (surface[x, y].Equals(surfaceItem)) { return false; }
+                    if (surfaceSet[x, y] && surface[x, y].Equals(surfaceItem)) { return false; }
 
                     surface[x, y] = surfaceItem;
                     surfaceSet[x, y] = true;
@@ -245,9 +245,26 @@ namespace Ax.Engine.Core
             {
                 case RenderingMode.ColorOnly:
                     {
-                        Color lastBackground = null;
-                        Color lastForeground = null;
-                        char lastChar;
+                        int width = surfaceSet.GetLength(0);
+
+                        Color[] flattenSurface =  surface.To1DArray(item => item?.color ?? Color.Black);
+
+                        List<(Color, int count)> groupedSurface = new List<(Color, int count)>();
+                        for (int i = 0; i < flattenSurface.Length; i++)
+                        {
+                            int count = 1;
+                            while (i < flattenSurface.Length - 1 && flattenSurface[i].Equals(flattenSurface[i + 1]))
+                            {
+                                i++;
+                                count++;
+                            }
+
+                            groupedSurface.Add((flattenSurface[i], count));
+                        }
+
+                        
+                        
+                        /*
 
                         bool lastPixelIsBackground = true;
                         List<string> builder = new List<string>();
@@ -295,7 +312,7 @@ namespace Ax.Engine.Core
                                     bytesBuilder.Append(' ');
                                 }
                             }
-                        }
+                        }*/
                     }
                     break;
             }

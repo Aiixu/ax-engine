@@ -78,5 +78,29 @@ namespace Ax.Engine.Utils
         public static int RoundToInt(float value) => (int)Math.Round(value);
         public static int RoundToInt(double value) => (int)Math.Round(value);
         #endregion
+
+        #region To1DArray Implementation
+        public static T[] To1DArray<T>(this T[,] input)
+        {
+            return To1DArray(input, i => i);
+        }
+
+        public static TResult[] To1DArray<T, TResult>(this T[,] input, Func<T, TResult> converter)
+        {
+            int size = input.Length;
+            TResult[] result = new TResult[size];
+
+            int write = 0;
+            for (int x = 0; x <= input.GetUpperBound(0); x++)
+            {
+                for (int y = 0; y <= input.GetUpperBound(1); y++)
+                {
+                    result[write++] = converter(input[x, y]);
+                }
+            }
+
+            return result;
+        }
+        #endregion
     }
 }

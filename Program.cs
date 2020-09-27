@@ -4,14 +4,28 @@ using Ax.Engine.Core;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
-using System.Text;
+
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Ax.Engine
 {
     internal class Program
     {
-        private static Game game;
+        public class GroupedSurfaceItem
+        {
+            public Color color;
+            public int count;
 
+            public GroupedSurfaceItem(Color color, int count)
+            {
+                this.color = color;
+                this.count = count;
+            }
+        }
+
+        private static Game game;
+        
         public static void Main(string[] _)
         {
             game = new GameBuilder()
