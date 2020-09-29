@@ -91,9 +91,9 @@ namespace Ax.Engine.Utils
             TResult[] result = new TResult[size];
 
             int write = 0;
-            for (int x = 0; x <= input.GetUpperBound(0); x++)
+            for (int y = 0; y <= input.GetUpperBound(1); y++)
             {
-                for (int y = 0; y <= input.GetUpperBound(1); y++)
+                for (int x = 0; x <= input.GetUpperBound(0); x++)
                 {
                     result[write++] = converter(input[x, y]);
                 }

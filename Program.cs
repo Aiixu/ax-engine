@@ -5,9 +5,6 @@ using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
 
-using System.Collections.Generic;
-using System.Diagnostics;
-
 namespace Ax.Engine
 {
     internal class Program
@@ -34,7 +31,7 @@ namespace Ax.Engine
                 .SetSize(60, 40)
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
-                .LimitFPS(11)
+                .LimitFPS(1000)
                 .SetRenderingMode(OutputHandler.RenderingMode.VTColorOnly)
                 .Build();
 

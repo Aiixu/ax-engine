@@ -10,6 +10,8 @@ using Ax.Engine.Utils;
 
 using static Ax.Engine.Core.Native;
 using static Ax.Engine.Utils.DefaultValue;
+using System.CodeDom.Compiler;
+using System.Net.NetworkInformation;
 
 namespace Ax.Engine.Core
 {
@@ -152,6 +154,7 @@ namespace Ax.Engine.Core
             switch(renderingMode)
             {
                 case RenderingMode.VTColorOnly:
+                case RenderingMode.VTColorAndChars:
                     surface = new SurfaceItem[width, height];
                     surfaceSet = new bool[width, height];
                     break;
@@ -179,6 +182,12 @@ namespace Ax.Engine.Core
                     {
                         case RenderingMode.VTColorOnly:
                             surfaceItem.color = bg;
+                            break;
+
+                        case RenderingMode.VTColorAndChars:
+                            surfaceItem.ch = ch;
+                            surfaceItem.fg = fg;
+                            surfaceItem.bg = bg;
                             break;
                     }
 
@@ -239,7 +248,7 @@ namespace Ax.Engine.Core
 
                         Color[] flattenSurface =  surface.To1DArray(item => item?.color ?? Color.Black);
 
-                        List<(Color, int count)> groupedSurface = new List<(Color, int count)>();
+                        List<(Color color, int count)> groupedSurface = new List<(Color color, int count)>();
                         for (int i = 0; i < flattenSurface.Length; i++)
                         {
                             int count = 1;
@@ -252,10 +261,16 @@ namespace Ax.Engine.Core
                             groupedSurface.Add((flattenSurface[i], count));
                         }
 
-                        
-                        
-                        /*
+                        for (int i = 0; i < groupedSurface.Count; i++)
+                        {
+                            bytesBuilder.Append(GetColorBackgroundString(groupedSurface[i].color));
+                            bytesBuilder.Append(new string(' ', groupedSurface[i].count));
+                        }
+                    }
+                    break;
 
+                case RenderingMode.VTColorAndChars:
+                    {
                         bool lastPixelIsBackground = true;
                         List<string> builder = new List<string>();
 
@@ -265,29 +280,16 @@ namespace Ax.Engine.Core
                             {
                                 SurfaceItem surfaceItem = surface[x, y];
 
-                                if(lastBackground == surfaceItem.color)
-                                {
-                                    builder[builder.Count - 1] += ' ';
-                                    continue;
-                                }
-                                else if(lastForeground == surfaceItem.color)
-                                {
-                                    builder[builder.Count - 1] += '█';
-                                    continue;
-                                }
-
-                                string bg = GetColorBackgroundString(surfaceItem.bg.r, surfaceItem.bg.g, surfaceItem.bg.b);
-                                string fg = GetColorForegroundString(surfaceItem.fg.r, surfaceItem.fg.g, surfaceItem.fg.b);
-
-                                bytesBuilder.Append(bg);
-                                bytesBuilder.Append(fg);
-                                bytesBuilder.Append(surfaceItem.ch == '\0' ? ' ' : surfaceItem.ch);
-
-                                lastPixelIsBackground = false;
-                                continue;
                                 if (surfaceSet[x, y])
                                 {
-                                    
+                                    string bg = GetColorBackgroundString(surfaceItem.bg.r, surfaceItem.bg.g, surfaceItem.bg.b);
+                                    string fg = GetColorForegroundString(surfaceItem.fg.r, surfaceItem.fg.g, surfaceItem.fg.b);
+
+                                    bytesBuilder.Append(bg);
+                                    bytesBuilder.Append(fg);
+                                    bytesBuilder.Append(surfaceItem.ch == '\0' ? ' ' : surfaceItem.ch);
+
+                                    lastPixelIsBackground = false;
                                 }
                                 else
                                 {
@@ -302,9 +304,10 @@ namespace Ax.Engine.Core
                                     bytesBuilder.Append(' ');
                                 }
                             }
-                        }*/
+                        }
                     }
                     break;
+
             }
             releaseStopwatch.Stop();
             
@@ -324,6 +327,11 @@ namespace Ax.Engine.Core
                 GlobalTime = globalStopwatch.Elapsed,
             };
 
+            Logger.Write($"CALC {calculationStopwatch.Elapsed}");
+            Logger.Write($"RELE {releaseStopwatch.Elapsed}");
+            Logger.Write($"WRIT {writeStopwatch.Elapsed}");
+            Logger.Write($"GLOB {globalStopwatch.Elapsed}");
+            Environment.Exit(0);
             // canPrepareSurface = true;
 
             return 0; //written
@@ -350,7 +358,7 @@ namespace Ax.Engine.Core
         private class SurfaceItem : IEquatable<SurfaceItem>
         {
             // RenderingMode.ColorOnly
-            public Color color;
+            public Color color = Color.Black;
 
             // RenderingMode.FullChar
             public Color fg;
@@ -363,6 +371,7 @@ namespace Ax.Engine.Core
             public bool Equals(SurfaceItem other) => renderingMode switch
             {
                 RenderingMode.VTColorOnly => color.Equals(other.color),
+                RenderingMode.VTColorAndChars => ch == other.ch && fg.Equals(other.fg) && bg.Equals(other.bg),
                 _ => throw new Exception("Unreachable"),
             };
         }
