@@ -17,9 +17,13 @@ namespace Ax.Engine.Core
     {
         public enum RenderingMode
         {
-            ColorOnly,
-            ColorOnlyHalfChar,
-            FullChar,
+            VTColorOnly,
+            VTColorOnlyHalfChar,
+            
+            VTColorAndChars,
+            VTColorOnlyAndChars,
+
+            ASCII
         }
 
         public const string ESC = "\x1b";
@@ -147,15 +151,9 @@ namespace Ax.Engine.Core
 
             switch(renderingMode)
             {
-                case RenderingMode.ColorOnly:
-                case RenderingMode.FullChar:
+                case RenderingMode.VTColorOnly:
                     surface = new SurfaceItem[width, height];
                     surfaceSet = new bool[width, height];
-                    break;
-
-                case RenderingMode.ColorOnlyHalfChar:
-                    surface = new SurfaceItem[width, MathHelper.CeilToInt(height / 2f)];
-                    surfaceSet = new bool[width, MathHelper.CeilToInt(height / 2f)];
                     break;
             }
         }
@@ -179,15 +177,8 @@ namespace Ax.Engine.Core
 
                     switch(renderingMode)
                     {
-                        case RenderingMode.ColorOnly:
-                        case RenderingMode.ColorOnlyHalfChar:
+                        case RenderingMode.VTColorOnly:
                             surfaceItem.color = bg;
-                            break;
-
-                        case RenderingMode.FullChar:
-                            surfaceItem.bg = bg;
-                            surfaceItem.fg = fg;
-                            surfaceItem.ch = ch;
                             break;
                     }
 
@@ -242,7 +233,7 @@ namespace Ax.Engine.Core
 
             switch(renderingMode)
             {
-                case RenderingMode.ColorOnly:
+                case RenderingMode.VTColorOnly:
                     {
                         int width = surfaceSet.GetLength(0);
 
@@ -369,21 +360,11 @@ namespace Ax.Engine.Core
             // Global
             public int z;
 
-            public bool Equals(SurfaceItem other)
+            public bool Equals(SurfaceItem other) => renderingMode switch
             {
-                switch(renderingMode)
-                {
-                    case RenderingMode.ColorOnly:
-                    case RenderingMode.ColorOnlyHalfChar:
-                        return color.Equals(other.color);
-
-                    case RenderingMode.FullChar:
-                        return fg.Equals(other.fg) && bg.Equals(other.bg) && ch == other.ch && z == other.z;
-
-                    default:
-                        throw new Exception("Unreachable");
-                }
-            }
+                RenderingMode.VTColorOnly => color.Equals(other.color),
+                _ => throw new Exception("Unreachable"),
+            };
         }
         
         public struct RenderData
