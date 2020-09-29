@@ -31,11 +31,11 @@ namespace Ax.Engine
                 .SetSize(60, 40)
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
-                .LimitFPS(1000)
-                .SetRenderingMode(OutputHandler.RenderingMode.VTColorAndChars)
+                .LimitFPS(11)
+                .SetRenderingMode(OutputHandler.RenderingMode.VTColorOnly)
                 .Build();
 
-            game.OpenDevMenu = true;
+            game.OpenDevMenu = false;
 
             EntityManager.EnableRegistry(false);
 

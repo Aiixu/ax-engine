@@ -87,8 +87,7 @@ namespace Ax.Engine.Utils
 
         public static TResult[] To1DArray<T, TResult>(this T[,] input, Func<T, TResult> converter)
         {
-            int size = input.Length;
-            TResult[] result = new TResult[size];
+            TResult[] result = new TResult[input.Length];
 
             int write = 0;
             for (int y = 0; y <= input.GetUpperBound(1); y++)

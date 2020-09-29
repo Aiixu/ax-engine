@@ -227,37 +227,24 @@ namespace Ax.Engine.Core
             releaseStopwatch.Start();
             StringBuilder bytesBuilder = new StringBuilder();
 
-            /*int size = surface.Length;
-            SurfaceItem[] flattenSurface = new SurfaceItem[size];
-            List<SurfaceItem> optimizedSurface = new List<SurfaceItem>(size);
-
-            int write = 0;
-            for (int x = 0; x <= surface.GetUpperBound(0); x++)
-            {
-                for (int y = 0; y <= surface.GetUpperBound(1); y++)
-                {
-                    flattenSurface[write++] = surface[x, y];
-                }
-            }*/
-
             switch(renderingMode)
             {
                 case RenderingMode.VTColorOnly:
                     {
                         int width = surfaceSet.GetLength(0);
 
-                        Color[] flattenSurface =  surface.To1DArray(item => item?.color ?? Color.Black);
+                        SurfaceItem[] flattenSurface =  surface.To1DArray();
 
                         for (int i = 0; i < flattenSurface.Length; i++)
                         {
                             int count = 1;
-                            while (i < flattenSurface.Length - 1 && flattenSurface[i].Equals(flattenSurface[i + 1]))
+                            while (i < flattenSurface.Length - 1 && ((flattenSurface[i] == null && flattenSurface[i + 1] == null) || (flattenSurface[i] != null && flattenSurface[i].Equals(flattenSurface[i + 1]))))
                             {
                                 i++;
                                 count++;
                             }
 
-                            bytesBuilder.Append(GetColorBackgroundString(flattenSurface[i]));
+                            bytesBuilder.Append(GetColorBackgroundString(flattenSurface[i]?.color ?? Color.Black));
                             bytesBuilder.Append(new string(' ', count));
                         }
                     }
@@ -306,7 +293,6 @@ namespace Ax.Engine.Core
             releaseStopwatch.Stop();
             
             writeStopwatch.Start();
-            Console.SetCursorPosition(0, 0);
             byte[] buffer = consoleEncoding.GetBytes(bytesBuilder.ToString());
             WriteConsole(HOUT, buffer, buffer.Length, out int written, IntPtr.Zero);
             writeStopwatch.Stop();
@@ -365,8 +351,8 @@ namespace Ax.Engine.Core
 
             public bool Equals(SurfaceItem other) => renderingMode switch
             {
-                RenderingMode.VTColorOnly => color.Equals(other.color),
-                RenderingMode.VTColorAndChars => ch == other.ch && fg.Equals(other.fg) && bg.Equals(other.bg),
+                RenderingMode.VTColorOnly => other != null && color.Equals(other.color),
+                RenderingMode.VTColorAndChars => other != null && ch == other.ch && fg.Equals(other.fg) && bg.Equals(other.bg),
                 _ => throw new Exception("Unreachable"),
             };
         }
