@@ -248,7 +248,6 @@ namespace Ax.Engine.Core
 
                         Color[] flattenSurface =  surface.To1DArray(item => item?.color ?? Color.Black);
 
-                        List<(Color color, int count)> groupedSurface = new List<(Color color, int count)>();
                         for (int i = 0; i < flattenSurface.Length; i++)
                         {
                             int count = 1;
@@ -258,13 +257,8 @@ namespace Ax.Engine.Core
                                 count++;
                             }
 
-                            groupedSurface.Add((flattenSurface[i], count));
-                        }
-
-                        for (int i = 0; i < groupedSurface.Count; i++)
-                        {
-                            bytesBuilder.Append(GetColorBackgroundString(groupedSurface[i].color));
-                            bytesBuilder.Append(new string(' ', groupedSurface[i].count));
+                            bytesBuilder.Append(GetColorBackgroundString(flattenSurface[i]));
+                            bytesBuilder.Append(new string(' ', count));
                         }
                     }
                     break;
@@ -295,8 +289,8 @@ namespace Ax.Engine.Core
                                 {
                                     if (!lastPixelIsBackground)
                                     {
-                                        //string bg = GetColorBackgroundString(0, 0, 0);
-                                        //bytesBuilder.Append(bg);
+                                        string bg = GetColorBackgroundString(0, 0, 0);
+                                        bytesBuilder.Append(bg);
 
                                         lastPixelIsBackground = true;
                                     }
@@ -327,11 +321,12 @@ namespace Ax.Engine.Core
                 GlobalTime = globalStopwatch.Elapsed,
             };
 
+            Logger.Write(renderingMode);
             Logger.Write($"CALC {calculationStopwatch.Elapsed}");
             Logger.Write($"RELE {releaseStopwatch.Elapsed}");
             Logger.Write($"WRIT {writeStopwatch.Elapsed}");
             Logger.Write($"GLOB {globalStopwatch.Elapsed}");
-            Environment.Exit(0);
+            //Environment.Exit(0);
             // canPrepareSurface = true;
 
             return 0; //written

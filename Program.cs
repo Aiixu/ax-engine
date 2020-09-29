@@ -32,7 +32,7 @@ namespace Ax.Engine
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
                 .LimitFPS(1000)
-                .SetRenderingMode(OutputHandler.RenderingMode.VTColorOnly)
+                .SetRenderingMode(OutputHandler.RenderingMode.VTColorAndChars)
                 .Build();
 
             game.OpenDevMenu = true;
