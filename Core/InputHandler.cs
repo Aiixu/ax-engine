@@ -6,25 +6,35 @@ namespace Ax.Engine.Core
 {
     public sealed class InputHandler
     {
-        public IntPtr HIN { get => hIn; }
+        public IntPtr Handle { get => handle; }
 
-        private IntPtr hIn;
+        private IntPtr handle;
         private CONSOLE_MODE_INPUT inLast;
 
         public bool Enable()
         {
-            if (!GetStdIn(out hIn)) { return false; }
-            if (!GetConsoleModeOut(HIN, out inLast)) { return false; }
+            if (!GetStdIn(out handle)) { return false; }
+            if (!GetConsoleModeOut(Handle, out inLast)) { return false; }
 
             CONSOLE_MODE_INPUT mode = inLast | CONSOLE_MODE_INPUT.ENABLE_VIRTUALTERMINALINPUT;
 
-            return SetConsoleMode(HIN, (uint)mode);
+            return SetConsoleMode(Handle, (uint)mode);
         }
 
         public bool Disable()
         {
-            this.hIn = IntPtr.Zero;
+            handle = IntPtr.Zero;
             return GetStdIn(out IntPtr hIn) && SetConsoleMode(hIn, (uint)inLast);
+        }
+        
+        public uint Read(out INPUT_RECORD[] rec)
+        {
+            GetNumberOfConsoleInputEvents(Handle, out uint numberOfEvents);
+
+            rec = new INPUT_RECORD[numberOfEvents];
+            ReadConsoleInput(Handle, rec, numberOfEvents, out uint numberOfEventRead);
+
+            return numberOfEventRead;
         }
 
         private bool GetStdIn(out IntPtr handle)

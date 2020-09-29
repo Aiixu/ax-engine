@@ -4,7 +4,8 @@ using Ax.Engine.Core;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
-using System.Threading;
+
+using static Ax.Engine.Core.Native;
 
 namespace Ax.Engine
 {
@@ -51,7 +52,42 @@ namespace Ax.Engine
             if (!IsRunning) { return; }
 
             // Capture events
+            uint eventCount = InputHandler.Read(out INPUT_RECORD[] recs);
 
+            Console.SetCursorPosition(0, 0);
+
+            if(eventCount == 0) { return; }
+
+            Console.WriteLine(eventCount);
+            for (int i = 0; i < 1; i++) // recs.Length
+            {
+                INPUT_RECORD rec = recs[i];
+
+                Console.WriteLine(rec.EventType);
+
+                Console.WriteLine("\n- FocusEvent -");
+                Console.WriteLine("bSetFocus :\t\t" + rec.FocusEvent.bSetFocus);
+
+                Console.WriteLine("\n- KeyEvent -");
+                Console.WriteLine("bKeyDown :\t\t" + rec.KeyEvent.bKeyDown);
+                Console.WriteLine("dwControlKeyState :\t" + rec.KeyEvent.dwControlKeyState);
+                Console.WriteLine("UnicodeChar :\t\t" + rec.KeyEvent.UnicodeChar);
+                Console.WriteLine("wRepeatCount :\t\t" + rec.KeyEvent.wRepeatCount);
+                Console.WriteLine("wVirtualKeyCode :\t" + rec.KeyEvent.wVirtualKeyCode);
+                Console.WriteLine("wVirtualScanCode:\t" + rec.KeyEvent.wVirtualScanCode);
+
+                Console.WriteLine("\n- MenuEvent -");
+                Console.WriteLine("dwCommandId :\t\t" + rec.MenuEvent.dwCommandId);
+
+                Console.WriteLine("\n- MouseEvent -");
+                Console.WriteLine("dwButtonState :\t\t" + rec.MouseEvent.dwButtonState);
+                Console.WriteLine("dwControlKeyState :\t" + rec.MouseEvent.dwControlKeyState);
+                Console.WriteLine("dwEventFlags :\t\t" + rec.MouseEvent.dwEventFlags);
+                Console.WriteLine("dwMousePosition :\t" + rec.MouseEvent.dwMousePosition);
+
+                Console.WriteLine("\n- WindowBufferSizeEvent -");
+                Console.WriteLine("dwSize :\t\t" + rec.WindowBufferSizeEvent.dwSize);
+            }
 
             // Handle built-in events
 

@@ -44,7 +44,7 @@ namespace Ax.Engine.Core
 
         private static readonly string[] BytesMap = Enumerable.Range(0, 256).Select(s => s.ToString()).ToArray();
 
-        public IntPtr HOUT { get => hOut; }
+        public IntPtr Handle { get => handle; }
 
         public RenderData LastFrameData { get; private set; }
 
@@ -58,7 +58,7 @@ namespace Ax.Engine.Core
 
         private static RenderingMode renderingMode;
 
-        private IntPtr hOut;
+        private IntPtr handle;
         private CONSOLE_MODE_OUTPUT outLast;
 
         internal CONSOLE_FONT_INFO_EX lastFont;
@@ -73,8 +73,8 @@ namespace Ax.Engine.Core
         // TODO : fontHeight
         public bool Enable(RenderingMode renderingMode, string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn, int frameDelay)
         {
-            if (!GetStdOut(out hOut)) { return false; }
-            if (!GetConsoleModeIn(HOUT, out outLast)) { return false; }
+            if (!GetStdOut(out handle)) { return false; }
+            if (!GetConsoleModeIn(Handle, out outLast)) { return false; }
 
             // Output mode
             CONSOLE_MODE_OUTPUT mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUALTERMINALPROCESSING;
@@ -85,7 +85,7 @@ namespace Ax.Engine.Core
 
             // Font
             lastFont = new CONSOLE_FONT_INFO_EX();
-            GetCurrentConsoleFontEx(hOut, false, ref lastFont);
+            GetCurrentConsoleFontEx(handle, false, ref lastFont);
 
             Default(ref fontName, StringNotNullOrEmpty, lastFont.FaceName);
             Default(ref fontWidth, IntegerPositive, lastFont.dwFontSize.X);
@@ -112,7 +112,7 @@ namespace Ax.Engine.Core
             OutputHandler.renderingMode = renderingMode;
             Console.CursorVisible = cursorVisible;
 
-            return SetConsoleMode(HOUT, (uint)mode);
+            return SetConsoleMode(Handle, (uint)mode);
         }
 
         public void WaitFrame()
@@ -129,12 +129,12 @@ namespace Ax.Engine.Core
 
         public bool Disable()
         {
-            hOut = IntPtr.Zero;
+            handle = IntPtr.Zero;
 
             bool disabled = false;
 
             disabled &= GetStdOut(out _);
-            disabled &= SetConsoleMode(HOUT, (uint)outLast);
+            disabled &= SetConsoleMode(Handle, (uint)outLast);
             
             SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), false, ref lastFont);
 
@@ -392,7 +392,7 @@ namespace Ax.Engine.Core
             writeStopwatch.Start();
             Console.SetCursorPosition(0, 0);
             byte[] buffer = consoleEncoding.GetBytes(bytesBuilder.ToString());
-            WriteConsole(HOUT, buffer, buffer.Length, out int written, IntPtr.Zero);
+            WriteConsole(Handle, buffer, buffer.Length, out int written, IntPtr.Zero);
             writeStopwatch.Stop();
 
             globalStopwatch.Stop();
