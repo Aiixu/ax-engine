@@ -9,20 +9,8 @@ namespace Ax.Engine
 {
     internal class Program
     {
-        public class GroupedSurfaceItem
-        {
-            public Color color;
-            public int count;
-
-            public GroupedSurfaceItem(Color color, int count)
-            {
-                this.color = color;
-                this.count = count;
-            }
-        }
-
         private static Game game;
-        
+
         public static void Main(string[] _)
         {
             game = new GameBuilder()
@@ -32,7 +20,7 @@ namespace Ax.Engine
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
                 .LimitFPS(11)
-                .SetRenderingMode(OutputHandler.RenderingMode.VTColorOnlyForeground)
+                .SetRenderingMode(OutputHandler.RenderingMode.VTColorOnlyBackground)
                 .Build();
 
             game.OpenDevMenu = false;

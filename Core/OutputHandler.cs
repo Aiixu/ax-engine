@@ -233,13 +233,14 @@ namespace Ax.Engine.Core
             releaseStopwatch.Start();
             StringBuilder bytesBuilder = new StringBuilder();
 
-            switch(renderingMode)
+            switch (renderingMode)
             {
                 case RenderingMode.VTColorOnlyBackground:
                 case RenderingMode.VTColorOnlyForeground:
                 case RenderingMode.VTColorOnlyBothBackgroundAndForeground:
                     {
-                        SurfaceItem[] flattenSurface =  surface.To1DArray();
+                        SurfaceItem[] flattenSurface = surface.To1DArray();
+                        List<GroupedSurfaceItem> groupedSurface = new List<GroupedSurfaceItem>();
 
                         for (int i = 0; i < flattenSurface.Length; i++)
                         {
@@ -250,8 +251,99 @@ namespace Ax.Engine.Core
                                 count++;
                             }
 
-                            bytesBuilder.Append(GetColorBackgroundString(flattenSurface[i]?.color ?? Color.Black));
-                            bytesBuilder.Append(new string(' ', count));
+                            Color surfaceColor = flattenSurface[i]?.color ?? Color.Black;
+
+                            if (renderingMode != RenderingMode.VTColorOnlyBothBackgroundAndForeground)
+                            {
+                                // VTColorOnlyBackground
+                                // VTColorOnlyForeground
+
+                                bytesBuilder.Append(renderingMode == RenderingMode.VTColorOnlyBackground ? GetColorBackgroundString(surfaceColor) : GetColorForegroundString(surfaceColor));
+                                bytesBuilder.Append(new string(renderingMode == RenderingMode.VTColorOnlyBackground ? ' ' : '█', count));
+                            }
+                            else
+                            {
+                                // VTColorOnlyBothBackgroundAndForeground
+
+                                groupedSurface.Add(new GroupedSurfaceItem(surfaceColor, count));
+                            }
+                        }
+
+                        if (renderingMode != RenderingMode.VTColorOnlyBothBackgroundAndForeground) { break; }
+
+                        // todo > move to single loop
+
+                        // VTColorOnlyBothBackgroundAndForeground
+
+                        Color lastBackground = null;
+                        Color lastForeground = null;
+
+                        const bool LAST_USED_IS_FOREGROUND = true;
+                        const bool LAST_USED_IS_BACKGROUND = false;
+
+                        bool lastUsed = false;
+
+                        for (int i = 0; i < groupedSurface.Count; i++)
+                        {
+                            Color color = groupedSurface[i].color;
+
+                            // 1rst  pass
+                            if (lastBackground == null)
+                            {
+                                bytesBuilder.Append(GetColorBackgroundString(groupedSurface[i].color));
+                                bytesBuilder.Append(new string(' ', groupedSurface[i].charCount));
+
+                                lastBackground = groupedSurface[i].color;
+                                lastUsed = LAST_USED_IS_BACKGROUND;
+
+                                continue;
+                            }
+
+                            if(lastForeground == null)
+                            {
+                                bytesBuilder.Append(GetColorForegroundString(groupedSurface[i].color));
+                                bytesBuilder.Append(new string('█', groupedSurface[i].charCount));
+
+                                lastForeground = groupedSurface[i].color;
+                                lastUsed = LAST_USED_IS_FOREGROUND;
+
+                                continue;
+                            }
+
+
+                            // Nth pass
+                            if(lastBackground.Equals(color))
+                            {
+                                bytesBuilder.Append(new string(' ', groupedSurface[i].charCount));
+                            }
+                            else if (lastForeground.Equals(color))
+                            {
+                                bytesBuilder.Append(new string('█', groupedSurface[i].charCount));
+                            }
+                            else
+                            {
+                                lastBackground = null;
+                                lastForeground = null;
+                            }
+
+                            
+
+                            continue;
+
+                            if (i >= groupedSurface.Count - 2) { continue; }
+
+
+                            if (color.Equals(groupedSurface[i + 2].color))
+                            {
+
+                            }
+
+                            /*if (i != groupedSurface.Count - 1)
+                            {
+                                bytesBuilder.Append(GetColorForegroundString(groupedSurface[i + 1].color));
+                                bytesBuilder.Append(new string('█', groupedSurface[i + 1].charCount));
+                                i++;
+                            }*/
                         }
                     }
                     break;
@@ -259,7 +351,6 @@ namespace Ax.Engine.Core
                 case RenderingMode.VTColorAndChars:
                     {
                         bool lastPixelIsBackground = true;
-                        List<string> builder = new List<string>();
 
                         for (int y = 0; y < surfaceSet.GetLength(1); y++)
                         {
@@ -299,6 +390,7 @@ namespace Ax.Engine.Core
             releaseStopwatch.Stop();
             
             writeStopwatch.Start();
+            Console.SetCursorPosition(0, 0);
             byte[] buffer = consoleEncoding.GetBytes(bytesBuilder.ToString());
             WriteConsole(HOUT, buffer, buffer.Length, out int written, IntPtr.Zero);
             writeStopwatch.Stop();
@@ -364,6 +456,18 @@ namespace Ax.Engine.Core
                 RenderingMode.VTColorAndChars => other != null && ch == other.ch && fg.Equals(other.fg) && bg.Equals(other.bg),
                 _ => throw new Exception("Unreachable"),
             };
+        }
+
+        private struct GroupedSurfaceItem
+        {
+            public Color color;
+            public int charCount;
+
+            public GroupedSurfaceItem(Color color, int charCount)
+            {
+                this.color = color;
+                this.charCount = charCount;
+            }
         }
         
         public struct RenderData

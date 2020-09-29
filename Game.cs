@@ -49,6 +49,12 @@ namespace Ax.Engine
         public void HandleEvents()
         {
             if (!IsRunning) { return; }
+
+            // Capture events
+
+
+            // Handle built-in events
+
         }
 
         public void Update()
