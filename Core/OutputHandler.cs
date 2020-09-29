@@ -10,8 +10,6 @@ using Ax.Engine.Utils;
 
 using static Ax.Engine.Core.Native;
 using static Ax.Engine.Utils.DefaultValue;
-using System.CodeDom.Compiler;
-using System.Net.NetworkInformation;
 
 namespace Ax.Engine.Core
 {
@@ -19,7 +17,10 @@ namespace Ax.Engine.Core
     {
         public enum RenderingMode
         {
-            VTColorOnly,
+            VTColorOnlyBackground,
+            VTColorOnlyForeground,
+            VTColorOnlyBothBackgroundAndForeground,
+
             VTColorOnlyHalfChar,
             
             VTColorAndChars,
@@ -153,7 +154,10 @@ namespace Ax.Engine.Core
 
             switch(renderingMode)
             {
-                case RenderingMode.VTColorOnly:
+                case RenderingMode.VTColorOnlyBackground:
+                case RenderingMode.VTColorOnlyForeground:
+                case RenderingMode.VTColorOnlyBothBackgroundAndForeground:
+
                 case RenderingMode.VTColorAndChars:
                     surface = new SurfaceItem[width, height];
                     surfaceSet = new bool[width, height];
@@ -180,7 +184,9 @@ namespace Ax.Engine.Core
 
                     switch(renderingMode)
                     {
-                        case RenderingMode.VTColorOnly:
+                        case RenderingMode.VTColorOnlyBackground:
+                        case RenderingMode.VTColorOnlyForeground:
+                        case RenderingMode.VTColorOnlyBothBackgroundAndForeground:
                             surfaceItem.color = bg;
                             break;
 
@@ -229,10 +235,10 @@ namespace Ax.Engine.Core
 
             switch(renderingMode)
             {
-                case RenderingMode.VTColorOnly:
+                case RenderingMode.VTColorOnlyBackground:
+                case RenderingMode.VTColorOnlyForeground:
+                case RenderingMode.VTColorOnlyBothBackgroundAndForeground:
                     {
-                        int width = surfaceSet.GetLength(0);
-
                         SurfaceItem[] flattenSurface =  surface.To1DArray();
 
                         for (int i = 0; i < flattenSurface.Length; i++)
@@ -351,7 +357,10 @@ namespace Ax.Engine.Core
 
             public bool Equals(SurfaceItem other) => renderingMode switch
             {
-                RenderingMode.VTColorOnly => other != null && color.Equals(other.color),
+                // REDUCE WITH C# 9.0 OR
+                RenderingMode.VTColorOnlyBackground => other != null && color.Equals(other.color),
+                RenderingMode.VTColorOnlyForeground => other != null && color.Equals(other.color),
+                RenderingMode.VTColorOnlyBothBackgroundAndForeground => other != null && color.Equals(other.color),
                 RenderingMode.VTColorAndChars => other != null && ch == other.ch && fg.Equals(other.fg) && bg.Equals(other.bg),
                 _ => throw new Exception("Unreachable"),
             };
