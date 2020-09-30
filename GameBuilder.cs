@@ -127,6 +127,15 @@ namespace Ax.Engine
 
             Thread.Sleep(100);
 
+            Game.WindowWidth = WindowWidth;
+            Game.WindowHeight = WindowHeight;
+
+            Game.WindowWidthInPixels = WindowWidth * FontWidth;
+            Game.WindowHeightInPixels = WindowHeight * FontHeight;
+
+            Game.FontWidth = FontWidth;
+            Game.FontHeight = FontHeight;
+
             return new Game(hWnd, hMenu, outputHandler, inputHandler, isRunning);
         }
     }

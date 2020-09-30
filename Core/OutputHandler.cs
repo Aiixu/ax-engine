@@ -403,6 +403,7 @@ namespace Ax.Engine.Core
                 ReleaseTime = releaseStopwatch.Elapsed,
                 WriteTime = writeStopwatch.Elapsed,
                 GlobalTime = globalStopwatch.Elapsed,
+                Surface = surface
             };
 
             Logger.Write(renderingMode);
@@ -434,7 +435,7 @@ namespace Ax.Engine.Core
             return true;
         }
 
-        private class SurfaceItem : IEquatable<SurfaceItem>
+        public sealed class SurfaceItem : IEquatable<SurfaceItem>
         {
             // RenderingMode.ColorOnly
             public Color color = Color.Black;
@@ -476,6 +477,7 @@ namespace Ax.Engine.Core
             public TimeSpan ReleaseTime { get; internal set; }
             public TimeSpan WriteTime { get; internal set; }
             public TimeSpan GlobalTime { get; internal set; }
+            public SurfaceItem[,] Surface { get; internal set; }
         }
     }
 }

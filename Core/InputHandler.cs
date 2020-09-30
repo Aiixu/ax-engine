@@ -37,6 +37,16 @@ namespace Ax.Engine.Core
             return numberOfEventRead;
         }
 
+        public uint Peek(out INPUT_RECORD[] rec)
+        {
+            GetNumberOfConsoleInputEvents(Handle, out uint numberOfEvents);
+
+            rec = new INPUT_RECORD[numberOfEvents];
+            PeekConsoleInput(Handle, rec, numberOfEvents, out uint numberOfEventRead);
+
+            return numberOfEventRead;
+        }
+
         private bool GetStdIn(out IntPtr handle)
         {
             handle = GetStdHandle(STD_INPUT_HANDLE);

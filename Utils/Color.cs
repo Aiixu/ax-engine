@@ -66,6 +66,8 @@ namespace Ax.Engine.Utils
             return FromRgb(r, g, b);
         }
 
+        public static System.Drawing.Color ToColor(Color rgb) => System.Drawing.Color.FromArgb(rgb.r, rgb.g, rgb.b);
+
         public bool Equals(Color other)
         {
             return other != null && r == other.r && g == other.g && b == other.b;

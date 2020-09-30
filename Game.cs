@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Reflection;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 using Ax.Engine.Core;
 using Ax.Engine.Utils;
@@ -7,6 +8,10 @@ using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
 
 using static Ax.Engine.Core.Native;
+
+using Color = Ax.Engine.Utils.Color;
+using System.Threading;
+using System.IO;
 
 namespace Ax.Engine
 {
@@ -24,6 +29,15 @@ namespace Ax.Engine
 
         public OutputHandler OutputHandler { get; private set; }
         public InputHandler InputHandler { get; private set; }
+
+        public static int WindowWidthInPixels { get; internal set; }
+        public static int WindowHeightInPixels { get; internal set; }
+
+        public static int WindowWidth { get; internal set; }
+        public static int WindowHeight { get; internal set; }
+
+        public static int FontWidth { get; internal set; }
+        public static int FontHeight { get; internal set; }
 
         public Game(IntPtr hWnd, IntPtr hMenu, OutputHandler outputHandler, InputHandler inputHandler, bool isRunning) 
         {
@@ -54,71 +68,85 @@ namespace Ax.Engine
 
             // Capture events
             uint eventCount = InputHandler.Read(out INPUT_RECORD[] recs);
+            FlushConsoleInputBuffer(InputHandler.Handle);
 
-            Console.SetCursorPosition(0, 0);
-
+            
+            /*
             if(eventCount == 0) { return; }
+
+            
             Console.Clear();
 
             Console.WriteLine(eventCount);
 
             FieldInfo[] fields = typeof(INPUT_RECORD).GetFields();
-            object[,] inputTable = new object[eventCount + 1, fields.Length + 13];
+            object[,] inputTable = new object[eventCount + 1, fields.Length + 14];
 
             int y = 1;
-            for (int i = 1; i < fields.Length; i++)
+            for (int i = 0; i < fields.Length; i++)
             {
                 FieldInfo[] subFields = fields[i].FieldType.GetFields();
                 inputTable[0, y++] = $"== {fields[i].Name}";
                 
                 for (int j = 0; j < subFields.Length; j++)
                 {
-                    inputTable[0, y++] = subFields[j].Name;
-
+                    if(i != 0) { inputTable[0, y++] = subFields[j].Name; }
+                    
                     for (int k = 0; k < eventCount; k++)
                     {
                         inputTable[k + 1, 0] = $"Event [{k + 1}]";
-                        inputTable[k + 1, y - 1] = subFields[j].GetValue(fields[i].GetValue(recs[k]));
+                        inputTable[k + 1, y - 1] = i == 0 ? fields[i].GetValue(recs[k]) : subFields[j].GetValue(fields[i].GetValue(recs[k]));
                     }
                 }
             }
 
             Console.WriteLine(Logger.GenTable(inputTable));
+            */
 
-            return;
-            
-            for (int i = 0; i < 1; i++) // recs.Length
+            for (int i = 0; i < eventCount; i++)
             {
-                INPUT_RECORD rec = recs[i];
+                // Process built-in events
+                switch(recs[i].EventType)
+                {
+                    // Keyboard
+                    case 1:
+                        switch(recs[i].KeyEvent.wVirtualKeyCode)
+                        {
+                            // F2
+                            case 113:
+                                if (OutputHandler.LastFrameData.Equals(default(OutputHandler.RenderData))) { continue; }
 
-                Console.WriteLine(rec.EventType);
+                                new Thread(() => TakeScreeshot(OutputHandler.LastFrameData.Surface)).Start();
+                                break;
+                        }
 
-                Console.WriteLine("\n- FocusEvent -");
-                Console.WriteLine("bSetFocus :\t\t" + rec.FocusEvent.bSetFocus);
-
-                Console.WriteLine("\n- KeyEvent -");
-                Console.WriteLine("bKeyDown :\t\t" + rec.KeyEvent.bKeyDown);
-                Console.WriteLine("dwControlKeyState :\t" + rec.KeyEvent.dwControlKeyState);
-                Console.WriteLine("UnicodeChar :\t\t" + rec.KeyEvent.UnicodeChar);
-                Console.WriteLine("wRepeatCount :\t\t" + rec.KeyEvent.wRepeatCount);
-                Console.WriteLine("wVirtualKeyCode :\t" + rec.KeyEvent.wVirtualKeyCode);
-                Console.WriteLine("wVirtualScanCode:\t" + rec.KeyEvent.wVirtualScanCode);
-
-                Console.WriteLine("\n- MenuEvent -");
-                Console.WriteLine("dwCommandId :\t\t" + rec.MenuEvent.dwCommandId);
-
-                Console.WriteLine("\n- MouseEvent -");
-                Console.WriteLine("dwButtonState :\t\t" + rec.MouseEvent.dwButtonState);
-                Console.WriteLine("dwControlKeyState :\t" + rec.MouseEvent.dwControlKeyState);
-                Console.WriteLine("dwEventFlags :\t\t" + rec.MouseEvent.dwEventFlags);
-                Console.WriteLine("dwMousePosition :\t" + rec.MouseEvent.dwMousePosition);
-
-                Console.WriteLine("\n- WindowBufferSizeEvent -");
-                Console.WriteLine("dwSize :\t\t" + rec.WindowBufferSizeEvent.dwSize);
+                        break;
+                }
             }
+        }
 
-            // Handle built-in events
+        public void TakeScreeshot(OutputHandler.SurfaceItem[,] surface)
+        {
+            if (!Directory.Exists("screenshots")) { Directory.CreateDirectory("screenshots"); }
 
+            Bitmap bmp = new Bitmap(WindowWidthInPixels, WindowHeightInPixels);
+
+            for (int y = 0; y < WindowHeight; y++)
+            {
+                for (int x = 0; x < WindowWidth; x++)
+                {
+                    for (int py = 0; py < FontHeight; py++)
+                    {
+                        for (int px = 0; px < FontWidth; px++)
+                        {
+                            bmp.SetPixel(x * FontWidth + px, y * FontHeight + py, Color.ToColor(surface[x, y]?.color ?? Color.Black));
+                        }
+                    }
+                }
+            }
+            
+            string outPath = Path.Combine("screenshots", string.Concat(DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-ff"), ".png"));
+            bmp.Save(outPath, ImageFormat.Png);
         }
 
         public void Update()

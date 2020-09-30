@@ -5,6 +5,7 @@ using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
 using System.Linq;
+using System.Threading;
 
 namespace Ax.Engine
 {
@@ -16,8 +17,8 @@ namespace Ax.Engine
         {
             game = new GameBuilder()
                 .SetTitle("Engine demo")
-                .SetFont("Lucidas Console", 8, 16)
-                .SetSize(120, 40)
+                .SetFont("Lucidas Console", 16, 16)
+                .SetSize(60, 40)
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
                 .LimitFPS(11)
@@ -38,8 +39,8 @@ namespace Ax.Engine
             while (game.IsRunning)
             {
                 game.HandleEvents();
-                //game.Update();
-                //game.Render();
+                game.Update();
+                game.Render();
             }
 
             game.Clean();
