@@ -6,6 +6,7 @@ using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
 using System.Linq;
 using System.Threading;
+using System.Collections;
 
 namespace Ax.Engine
 {
@@ -36,11 +37,22 @@ namespace Ax.Engine
             animatedCharacter.animationDelay = 0;
             animatedCharacter.Transform.position = new Vector2(5, 0);
 
+            IEnumerator CoroutineTest()
+            {
+                Console.WriteLine("a");
+
+                yield return new WaitForSeconds(5);
+
+                Console.WriteLine("b");
+            }
+
+            Yielder.StartCoroutine(CoroutineTest());
+
             while (game.IsRunning)
             {
                 game.HandleEvents();
                 game.Update();
-                game.Render();
+                //game.Render();
             }
 
             game.Clean();

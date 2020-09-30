@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Collisions.cs" />
+    <Compile Include="Core\Coroutine.cs" />
     <Compile Include="Core\Logger.cs" />
     <Compile Include="Core\InputHandler.cs" />
     <Compile Include="Core\Enums\NativeConsoleEvents.cs" />
@@ -104,6 +105,10 @@
     <Compile Include="Core\Structs\NativeMenuRecord.cs" />
     <Compile Include="Core\Structs\NativeSmallRect.cs" />
     <Compile Include="Core\Structs\NativeWindowBufferSizeRecord.cs" />
+    <Compile Include="Core\Yielder.cs" />
+    <Compile Include="Core\YieldInstructions\WaitForEndOfFrame.cs" />
+    <Compile Include="Core\YieldInstructions\WaitForSeconds.cs" />
+    <Compile Include="Core\YieldInstructions\YieldInstruction.cs" />
     <Compile Include="ECS\Component.cs" />
     <Compile Include="ECS\ComponentAttributes\UniqueComponentAttribute.cs" />
     <Compile Include="ECS\Components\AnimatedSpriteComponent.cs" />

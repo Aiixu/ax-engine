@@ -153,6 +153,7 @@ namespace Ax.Engine
         {
             if (!IsRunning) { return; }
 
+            Yielder.ProcessCoroutines();
             EntityManager.Update();
             FrameCount++;
         }
