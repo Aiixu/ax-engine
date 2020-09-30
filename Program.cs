@@ -17,7 +17,7 @@ namespace Ax.Engine
             game = new GameBuilder()
                 .SetTitle("Engine demo")
                 .SetFont("Lucidas Console", 8, 16)
-                .SetSize(60, 40)
+                .SetSize(120, 40)
                 .SetPosition(10, 10)
                 .SetCursorVisible(false)
                 .LimitFPS(11)

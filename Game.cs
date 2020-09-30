@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 using Ax.Engine.Core;
 using Ax.Engine.Utils;
@@ -57,19 +58,32 @@ namespace Ax.Engine
             Console.SetCursorPosition(0, 0);
 
             if(eventCount == 0) { return; }
+            Console.Clear();
 
             Console.WriteLine(eventCount);
 
-            object[,] inputTable = new object[eventCount + 1, 2];
+            FieldInfo[] fields = typeof(INPUT_RECORD).GetFields();
+            object[,] inputTable = new object[eventCount + 1, fields.Length + 13];
 
-            for (int i = 0; i < eventCount; i++)
+            int y = 1;
+            for (int i = 1; i < fields.Length; i++)
             {
-                inputTable[i + 1, 0] = $"Event [{i + 1}]";
-                inputTable[i + 1, 1] = $"Event [{i + 1}]";
+                FieldInfo[] subFields = fields[i].FieldType.GetFields();
+                inputTable[0, y++] = $"== {fields[i].Name}";
+                
+                for (int j = 0; j < subFields.Length; j++)
+                {
+                    inputTable[0, y++] = subFields[j].Name;
+
+                    for (int k = 0; k < eventCount; k++)
+                    {
+                        inputTable[k + 1, 0] = $"Event [{k + 1}]";
+                        inputTable[k + 1, y - 1] = subFields[j].GetValue(fields[i].GetValue(recs[k]));
+                    }
+                }
             }
 
             Console.WriteLine(Logger.GenTable(inputTable));
-
 
             return;
             

@@ -46,7 +46,7 @@ namespace Ax.Engine.Core
             IEnumerable<int> xIterator = Enumerable.Range(0, colWidthes.Length);
             string horizontalSeparator = $"+{string.Join("", xIterator.Select(x => $"{new string('-', colWidthes[x])}+"))}";
 
-            string GetRow(int y) => $"|{string.Join("|", xIterator.Select(x => $"{args[x, y]}{new string(' ', colWidthes[x] - args[x, y]?.ToString().Length ?? 0)}"))}|";
+            string GetRow(int y) => $"|{string.Join("|", xIterator.Select(x => $"{args[x, y]}{new string(' ', colWidthes[x] - (args[x, y]?.ToString().Length ?? 0))}"))}|";
 
             StringBuilder table = new StringBuilder()
                 /* HEADER */ .Append($"{horizontalSeparator}\n{GetRow(0)}\n{horizontalSeparator}")       
