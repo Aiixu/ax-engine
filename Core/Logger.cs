@@ -43,14 +43,14 @@ namespace Ax.Engine.Core
             }
 
             IEnumerable<int> xIterator = Enumerable.Range(0, colWidthes.Length);
-
             string horizontalSeparator = $"+{string.Join("", xIterator.Select(x => $"{new string('-', colWidthes[x])}+"))}";
 
-            StringBuilder table 
-                = new StringBuilder()
-                .Append($"{horizontalSeparator}\n{$"|{string.Join("|", xIterator.Select(x => $"{args[0, x]}{new string(' ', colWidthes[x] - args[0, x].ToString().Length)}"))}|"}\n{horizontalSeparator}")
-                .Append($"\n{string.Join("\n", Enumerable.Range(1, args.GetLength(0) - 1).Select(y => $"|{string.Join("|", xIterator.Select(x => $"{args[y, x]}{new string(' ', colWidthes[x] - args[y, x].ToString().Length)}"))}|"))}")
-                .Append($"\n{horizontalSeparator}");
+            string GetRow(int y) => $"|{string.Join("|", xIterator.Select(x => $"{args[y, x]}{new string(' ', colWidthes[x] - args[y, x].ToString().Length)}"))}|";
+
+            StringBuilder table = new StringBuilder()
+                /* HEADER */ .Append($"{horizontalSeparator}\n{GetRow(0)}\n{horizontalSeparator}")       
+                /* ROWS   */ .Append($"\n{string.Join("\n", Enumerable.Range(1, args.GetLength(0) - 1).Select(y => GetRow(y)))}")
+                /* FOOTER */ .Append($"\n{horizontalSeparator}");
 
             return table.ToString();
         }
