@@ -59,6 +59,20 @@ namespace Ax.Engine
             if(eventCount == 0) { return; }
 
             Console.WriteLine(eventCount);
+
+            object[,] inputTable = new object[eventCount + 1, 2];
+
+            for (int i = 0; i < eventCount; i++)
+            {
+                inputTable[i + 1, 0] = $"Event [{i + 1}]";
+                inputTable[i + 1, 1] = $"Event [{i + 1}]";
+            }
+
+            Console.WriteLine(Logger.GenTable(inputTable));
+
+
+            return;
+            
             for (int i = 0; i < 1; i++) // recs.Length
             {
                 INPUT_RECORD rec = recs[i];

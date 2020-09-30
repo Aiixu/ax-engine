@@ -35,20 +35,6 @@ namespace Ax.Engine
             animatedCharacter.animationDelay = 0;
             animatedCharacter.Transform.position = new Vector2(5, 0);
 
-            object[,] args = new object[,]
-                {
-                    { "Col1", "Column 2", "C3", "Colmun number 3" },
-                    { "arg1", "argument 1", "aaaaaaaaaaa", "a" },
-                    { "arg1", "argument 1", "aaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaaaa" },
-                    { "aaaaaa", " 1", "aaaaaaaaaaa", "j" }
-                };
-
-            Console.WriteLine(Logger.GenTable(args));
-
-            Console.Read();
-            Environment.Exit(0);
-
-
             while (game.IsRunning)
             {
                 game.HandleEvents();

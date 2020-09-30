@@ -32,24 +32,25 @@ namespace Ax.Engine.Core
 
         public static string GenTable(object[,] args, int maxColWidth = int.MaxValue)
         {
-            int[] colWidthes = new int[args.GetLength(1)];
+            int[] colWidthes = new int[args.GetLength(0)];
 
-            for (int x = 0; x < args.GetLength(1); x++)
+            for (int y = 0; y < args.GetLength(1); y++)
             {
-                for (int y = 0; y < args.GetLength(0); y++)
+                for (int x = 0; x < args.GetLength(0); x++)
                 {
-                    colWidthes[x] = Math.Min(maxColWidth, Math.Max(colWidthes[x], args[y, x].ToString().Length));
+                    if(args[x, y] == null) { continue; }
+                    colWidthes[x] = Math.Min(maxColWidth, Math.Max(colWidthes[x], args[x, y].ToString().Length));
                 }
             }
 
             IEnumerable<int> xIterator = Enumerable.Range(0, colWidthes.Length);
             string horizontalSeparator = $"+{string.Join("", xIterator.Select(x => $"{new string('-', colWidthes[x])}+"))}";
 
-            string GetRow(int y) => $"|{string.Join("|", xIterator.Select(x => $"{args[y, x]}{new string(' ', colWidthes[x] - args[y, x].ToString().Length)}"))}|";
+            string GetRow(int y) => $"|{string.Join("|", xIterator.Select(x => $"{args[x, y]}{new string(' ', colWidthes[x] - args[x, y]?.ToString().Length ?? 0)}"))}|";
 
             StringBuilder table = new StringBuilder()
                 /* HEADER */ .Append($"{horizontalSeparator}\n{GetRow(0)}\n{horizontalSeparator}")       
-                /* ROWS   */ .Append($"\n{string.Join("\n", Enumerable.Range(1, args.GetLength(0) - 1).Select(y => GetRow(y)))}")
+                /* ROWS   */ .Append($"\n{string.Join("\n", Enumerable.Range(1, args.GetLength(1) - 1).Select(y => GetRow(y)))}")
                 /* FOOTER */ .Append($"\n{horizontalSeparator}");
 
             return table.ToString();
