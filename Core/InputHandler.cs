@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using static Ax.Engine.Core.Native;
 
@@ -10,6 +11,8 @@ namespace Ax.Engine.Core
 
         private IntPtr handle;
         private CONSOLE_MODE_INPUT inLast;
+
+        private static readonly Dictionary<string, Axis> axises = new Dictionary<string, Axis>();
 
         public bool Enable()
         {
@@ -47,12 +50,6 @@ namespace Ax.Engine.Core
             return numberOfEventRead;
         }
 
-        private bool GetStdIn(out IntPtr handle)
-        {
-            handle = GetStdHandle(STD_INPUT_HANDLE);
-            return handle != INVALID_HANDLE;
-        }
-
         private bool GetConsoleModeOut(IntPtr hConsoleHandle, out CONSOLE_MODE_INPUT mode)
         {
             if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
@@ -63,6 +60,46 @@ namespace Ax.Engine.Core
 
             mode = (CONSOLE_MODE_INPUT)lpMode;
             return true;
+        }
+
+        public static void RegisterAxis(Axis axis, bool overrideIfExists = false)
+        {
+            if(overrideIfExists || !axises.ContainsKey(axis.name))
+            {
+                axises[axis.name] = axis;
+            }
+        }
+
+        public static bool GetKey(KEY key)
+        {
+            return false;
+        }
+
+        public static bool GetKeyDown(KEY key)
+        {
+            return false;
+        }
+
+        public static bool GetKeyUp(KEY key)
+        {
+            return false;
+        }
+
+        private static bool GetStdIn(out IntPtr handle)
+        {
+            handle = GetStdHandle(STD_INPUT_HANDLE);
+            return handle != INVALID_HANDLE;
+        }
+
+        public sealed class Axis
+        {
+            public string name;
+
+            public KEY positiveKey;
+            public KEY negativeKey;
+
+            public KEY alternativePositiveKey;
+            public KEY alternativeNegativeKey;
         }
     }
 }

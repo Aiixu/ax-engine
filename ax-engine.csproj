@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Core\Collisions.cs" />
     <Compile Include="Core\Coroutine.cs" />
+    <Compile Include="Core\Enums\KEY.cs" />
     <Compile Include="Core\Logger.cs" />
     <Compile Include="Core\InputHandler.cs" />
     <Compile Include="Core\Enums\NativeConsoleEvents.cs" />

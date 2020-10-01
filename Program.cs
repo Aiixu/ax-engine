@@ -36,22 +36,7 @@ namespace Ax.Engine
             animatedCharacter.ImportSheet("assets/character-new", new Vector2Int(40, 40));
             animatedCharacter.animationDelay = 0;
             animatedCharacter.Transform.position = new Vector2(5, 0);
-
-            IEnumerator CoroutineTest()
-            {
-                Console.WriteLine("a");
-
-                yield return new WaitForSeconds(5);
-
-                Console.WriteLine("b");
-
-                yield return new WaitForSeconds(1);
-
-                Console.WriteLine("c");
-            }
-
-            Yielder.StartCoroutine(CoroutineTest());
-
+            
             while (game.IsRunning)
             {
                 game.HandleEvents();
