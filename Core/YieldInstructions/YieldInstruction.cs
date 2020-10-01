@@ -2,11 +2,14 @@
 
 namespace Ax.Engine.Core
 {
-    public class YieldInstruction
+    public abstract class YieldInstruction
     {
-        public IEnumerator routine;
+        internal IEnumerator routine;
 
-        public YieldInstruction() { }
+        public YieldInstruction() 
+        {
+            routine = Routine();
+        }
 
         public bool MoveNext()
         {
@@ -14,5 +17,7 @@ namespace Ax.Engine.Core
                 yieldInstruction.MoveNext() || routine.MoveNext() :
                 routine.MoveNext();
         }
+
+        internal abstract IEnumerator Routine();
     }
 }

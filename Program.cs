@@ -44,6 +44,10 @@ namespace Ax.Engine
                 yield return new WaitForSeconds(5);
 
                 Console.WriteLine("b");
+
+                yield return new WaitForSeconds(1);
+
+                Console.WriteLine("c");
             }
 
             Yielder.StartCoroutine(CoroutineTest());

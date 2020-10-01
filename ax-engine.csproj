@@ -108,6 +108,8 @@
     <Compile Include="Core\Yielder.cs" />
     <Compile Include="Core\YieldInstructions\WaitForEndOfFrame.cs" />
     <Compile Include="Core\YieldInstructions\WaitForSeconds.cs" />
+    <Compile Include="Core\YieldInstructions\WaitUntil.cs" />
+    <Compile Include="Core\YieldInstructions\WaitWhile.cs" />
     <Compile Include="Core\YieldInstructions\YieldInstruction.cs" />
     <Compile Include="ECS\Component.cs" />
     <Compile Include="ECS\ComponentAttributes\UniqueComponentAttribute.cs" />

@@ -8,5 +8,10 @@ namespace Ax.Engine.Core
 		{
 			this.routine = routine;
 		}
-	}
+
+        internal override IEnumerator Routine()
+        {
+			yield return null;
+        }
+    }
 }

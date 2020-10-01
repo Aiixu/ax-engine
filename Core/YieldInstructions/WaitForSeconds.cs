@@ -12,10 +12,9 @@ namespace Ax.Engine.Core
         {
             start = DateTime.Now;
             delay = seconds;
-            routine = Routine();
         }
 
-        private IEnumerator Routine()
+        internal override IEnumerator Routine()
         {
             while ((DateTime.Now - start).TotalSeconds < delay)
             {

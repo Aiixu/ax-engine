@@ -4,12 +4,9 @@ namespace Ax.Engine.Core
 {
     public sealed class WaitForEndOfFrame : YieldInstruction
     {
-        public WaitForEndOfFrame()
-        {
-            routine = Routine();
-        }
+        public WaitForEndOfFrame() { }
 
-        private IEnumerator Routine()
+        internal override IEnumerator Routine()
         {
             yield return true;
         }
