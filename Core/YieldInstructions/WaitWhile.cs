@@ -5,7 +5,7 @@ namespace Ax.Engine.Core
 {
     public sealed class WaitWhile : YieldInstruction
     {
-        private Func<bool> predicate;
+        private readonly Func<bool> predicate;
 
         public WaitWhile(Func<bool> predicate)
         {
@@ -14,7 +14,10 @@ namespace Ax.Engine.Core
 
         internal override IEnumerator Routine()
         {
-            yield return predicate.Invoke();
+            while (predicate.Invoke())
+            {
+                yield return false;
+            }
         }
     }
 }

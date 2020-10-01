@@ -107,6 +107,8 @@
     <Compile Include="Core\Structs\NativeWindowBufferSizeRecord.cs" />
     <Compile Include="Core\Yielder.cs" />
     <Compile Include="Core\YieldInstructions\WaitForEndOfFrame.cs" />
+    <Compile Include="Core\YieldInstructions\WaitForFrameCount.cs" />
+    <Compile Include="Core\YieldInstructions\WaitForMilliseconds.cs" />
     <Compile Include="Core\YieldInstructions\WaitForSeconds.cs" />
     <Compile Include="Core\YieldInstructions\WaitUntil.cs" />
     <Compile Include="Core\YieldInstructions\WaitWhile.cs" />

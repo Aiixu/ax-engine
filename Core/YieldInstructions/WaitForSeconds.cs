@@ -1,25 +1,8 @@
-﻿using System;
-using System.Collections;
-
-namespace Ax.Engine.Core
+﻿namespace Ax.Engine.Core
 {
-    public sealed class WaitForSeconds : YieldInstruction
+    public sealed class WaitForSeconds : WaitForMilliseconds
     {
-        private DateTime start;
-        private int delay;
-
-        public WaitForSeconds(int seconds)
-        {
-            start = DateTime.Now;
-            delay = seconds;
-        }
-
-        internal override IEnumerator Routine()
-        {
-            while ((DateTime.Now - start).TotalSeconds < delay)
-            {
-                yield return false;
-            }
-        }
+        public WaitForSeconds(int seconds) : base(seconds * 1000) 
+        { }
     }
 }
