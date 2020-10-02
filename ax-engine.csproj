@@ -69,6 +69,7 @@
     <Compile Include="Core\Enums\BUFFER_SHARE_MODE.cs" />
     <Compile Include="Core\Enums\CHAR_ATTRIBUTE.cs" />
     <Compile Include="Core\Enums\CONSOLE_DISPLAY_MODE.cs" />
+    <Compile Include="Core\Enums\CONSOLE_WINDOW_MODE.cs" />
     <Compile Include="Core\Enums\CONSOLE_HISTORY_INFO_FLAGS.cs" />
     <Compile Include="Core\Enums\CONSOLE_SELECTION_INFO_FLAGS.cs" />
     <Compile Include="Core\Enums\CONTROL_KEY_STATE.cs" />
@@ -94,12 +95,10 @@
     <Compile Include="Core\Functions\PseudoConsole.cs" />
     <Compile Include="Core\Logger.cs" />
     <Compile Include="Core\InputHandler.cs" />
-    <Compile Include="Core\Enums\NativeConsoleEvents.cs" />
     <Compile Include="Core\Enums\CONSOLE_MODE_INPUT.cs" />
     <Compile Include="Core\Enums\CONSOLE_MODE_OUTPUT.cs" />
-    <Compile Include="Core\Enums\NativeCtrlTypes.cs" />
-    <Compile Include="Core\Enums\NativeLF.cs" />
-    <Compile Include="Core\Enums\NativeMF.cs" />
+    <Compile Include="Core\Enums\CTRL_TYPES.cs" />
+    <Compile Include="Core\Enums\LF.cs" />
     <Compile Include="Core\Enums\NativeSC.cs" />
     <Compile Include="Core\Enums\NativeSCF.cs" />
     <Compile Include="Core\Enums\NativeSWP.cs" />

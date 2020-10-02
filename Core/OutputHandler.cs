@@ -98,7 +98,7 @@ namespace Ax.Engine.Core
             newFont.dwFontSize.X = (short)fontWidth;
             newFont.dwFontSize.Y = (short)fontHeight;
 
-            SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), false, ref newFont);
+            SetCurrentConsoleFontEx(GetStdHandle((uint)HANDLE.STD_OUTPUT_HANDLE), false, ref newFont);
             
             calculationStopwatch = new Stopwatch();
             releaseStopwatch = new Stopwatch();
@@ -136,7 +136,7 @@ namespace Ax.Engine.Core
             disabled &= GetStdOut(out _);
             disabled &= SetConsoleMode(Handle, (uint)outLast);
             
-            SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), false, ref lastFont);
+            SetCurrentConsoleFontEx(GetStdHandle((uint)HANDLE.STD_OUTPUT_HANDLE), false, ref lastFont);
 
             return disabled;
         }
@@ -419,7 +419,7 @@ namespace Ax.Engine.Core
 
         private bool GetStdOut(out IntPtr handle)
         {
-            handle = GetStdHandle(STD_OUTPUT_HANDLE);
+            handle = GetStdHandle((uint)HANDLE.STD_OUTPUT_HANDLE);
             return handle != INVALID_HANDLE;
         }
 

@@ -15,7 +15,8 @@ namespace Ax.Engine.Core
         /// <param name="lpSecurityAttributes">A pointer to a <see cref="SECURITY_ATTRIBUTES"/> structure that determines whether the returned handle can be inherited by child processes. If <paramref name="lpSecurityAttributes"/> is <see langword="null"/>, the handle cannot be inherited. The <i>lpSecurityDescriptor</i> member of the structure specifies a security descriptor for the new console screen buffer. If <see cref="SECURITY_ATTRIBUTES.lpSecurityAttributes"/> is <paramref name="lpSecurityAttributes"/>, the console screen buffer gets a default security descriptor. The ACLs in the default security descriptor for a console screen buffer come from the primary or impersonation token of the creator.</param>
         /// <param name="dwFlags">The type of console screen buffer to create.</param>
         /// <param name="lpScreenBufferData">Reserved; should be <see langword="null"/>.</param>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr CreateConsoleScreenBuffer(long dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwFlags, IntPtr lpScreenBufferData);
+        /// <returns>If the function succeeds, the return value is a handle to the new console screen buffer.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr CreateConsoleScreenBuffer([In] long dwDesiredAccess, [In] uint dwShareMode, [In, Optional] IntPtr lpSecurityAttributes, [In] uint dwFlags, IntPtr lpScreenBufferData);
 
         /// <summary>
         ///  Retrieves information about the specified console screen buffer.
@@ -23,7 +24,7 @@ namespace Ax.Engine.Core
         /// <param name="hConsoleOutput">A handle to the console screen buffer. The handle must have the GENERIC_READ access right</param>
         /// <param name="lpConsoleScreenBufferInfo">A <see cref="CONSOLE_sc"/> structure that contains the console screen buffer information.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GetConsoleScreenBufferInfo(IntPtr hConsoleOutput, out CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GetConsoleScreenBufferInfo([In] IntPtr hConsoleOutput, [Out] out CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
 
         /// <summary>
         ///  Changes the size of the specified console screen buffer.
@@ -31,7 +32,7 @@ namespace Ax.Engine.Core
         /// <param name="hConsoleOutput">A handle to the console screen buffer. The handle must have the <see cref="BUFFER_ACCESS_MODE.GENERIC_WRITE"/> access right.</param>
         /// <param name="dwSize">A <see cref=""/> structure that specifies the new size of the console screen buffer, in character rows and columns. The specified width and height cannot be less than the width and height of the console screen buffer's window. The specified dimensions also cannot be less than the minimum size allowed by the system.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool SetConsoleScreenBufferSize(IntPtr hConsoleOutput, COORD dwSize);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool SetConsoleScreenBufferSize([In] IntPtr hConsoleOutput, [In] COORD dwSize);
 
         /// <summary>
         ///  
@@ -39,7 +40,7 @@ namespace Ax.Engine.Core
         /// <param name="hConsoleOutput"></param>
         /// <param name="ConsoleScreenBufferInfo"></param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GetConsoleScreenBufferInfoEx(IntPtr hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GetConsoleScreenBufferInfoEx([In] IntPtr hConsoleOutput, [In, Out] ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo);
 
         /// <summary>
         ///  Sets extended information about the specified console screen buffer.

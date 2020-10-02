@@ -57,6 +57,6 @@ namespace Ax.Engine.Core
         /// <param name="dwWriteCoord">A <see cref="COORD"/> structure that specifies the character coordinates of the first cell in the console screen buffer to which characters will be written.</param>
         /// <param name="lpNumberOfCharsWritten">A pointer to a variable that receives the number of characters actually written.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool WriteConsoleOutputCharacter(IntPtr hConsoleOutput, string lpCharacter, uint nLength, COORD dwWriteCoord, out uint lpNumberOfCharsWritten);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool WriteConsoleOutputCharacter([In] IntPtr hConsoleOutput, [In] string lpCharacter, [In] uint nLength, [In] COORD dwWriteCoord, [Out] out uint lpNumberOfCharsWritten);
     }
 }

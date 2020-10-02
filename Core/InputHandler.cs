@@ -57,7 +57,7 @@ namespace Ax.Engine.Core
 
         private bool GetStdIn(out IntPtr handle)
         {
-            handle = GetStdHandle(STD_INPUT_HANDLE);
+            handle = GetStdHandle((uint)HANDLE.STD_INPUT_HANDLE);
             return handle != INVALID_HANDLE;
         }
 

@@ -12,7 +12,8 @@ namespace Ax.Engine.Core
         /// </summary>
         /// <param name="hConsoleOutput">A handle to the console screen buffer. The handle must have the GENERIC_READ access right</param>
         /// <param name="nFont">The index of the font whose size is to be retrieved.</param>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern COORD GetConsoleFontSize(IntPtr hConsoleOutput, int nFont);
+        /// <returns>If the function succeeds, the return value is a <see cref="COORD"/> structure that contains the width and height of each character in the font, in logical units. The X member contains the width, while the Y member contains the height.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern COORD GetConsoleFontSize([In] IntPtr hConsoleOutput, [In] int nFont);
 
         /// <summary>
         ///  Sets extended information about the current console font.
@@ -30,7 +31,7 @@ namespace Ax.Engine.Core
         /// <param name="bMaximumWindow">If this parameter is TRUE, font information is retrieved for the maximum window size. If this parameter is FALSE, font information is retrieved for the current window size.</param>
         /// <param name="lpConsoleCurrentFont">A <see cref="CONSOLE_FONT_INFO"/> structure that contains the requested font information.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)] public static extern bool GetCurrentConsoleFont(IntPtr hConsoleOutput, bool bMaximumWindow, [Out] CONSOLE_FONT_INFOEX lpConsoleCurrentFont);
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)] public static extern bool GetCurrentConsoleFont([In] IntPtr hConsoleOutput, [In] bool bMaximumWindow, [Out] CONSOLE_FONT_INFOEX lpConsoleCurrentFont);
 
         /// <summary>
         ///  Retrieves extended information about the current console font.
@@ -39,6 +40,6 @@ namespace Ax.Engine.Core
         /// <param name="bMaximumWindow">If this parameter is TRUE, font information is retrieved for the maximum window size. If this parameter is FALSE, font information is retrieved for the current window size.</param>
         /// <param name="lpConsoleCurrentFontEx">A <see cref="CONSOLE_FONT_INFOEX"/> structure that contains the requested font information.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)] public static extern bool GetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool bMaximumWindow, ref CONSOLE_FONT_INFOEX lpConsoleCurrentFontEx);
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)] public static extern bool GetCurrentConsoleFontEx([In] IntPtr hConsoleOutput, [In] bool bMaximumWindow, [Out] ref CONSOLE_FONT_INFOEX lpConsoleCurrentFontEx);
     }
 }

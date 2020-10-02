@@ -18,7 +18,7 @@ namespace Ax.Engine.Core
         ///  This parameter requires Unicode input by default. For ANSI mode, set this parameter to see langword="null"/>.
         /// </param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsole(IntPtr hConsoleInput, [Out] StringBuilder lpBuffer, uint nNumberOfCharsToRead, [Out] out uint lpNumberOfCharsRead, [Optional] CONSOLE_READCONSOLE_CONTROL pInputControl);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsole([In] IntPtr hConsoleInput, [Out] StringBuilder lpBuffer, [In] uint nNumberOfCharsToRead, [Out] out uint lpNumberOfCharsRead, [In, Optional] CONSOLE_READCONSOLE_CONTROL pInputControl);
 
         /// <summary>
         ///  Reads data from the specified console input buffer without removing it from the buffer.
@@ -28,7 +28,7 @@ namespace Ax.Engine.Core
         /// <param name="nLength">The size of the array pointed to by the <paramref name="lpBuffer"/> parameter, in array elements.</param>
         /// <param name="lpNumberOfEventsRead">A pointer to a variable that receives the number of input records read.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool PeekConsoleInput(IntPtr hConsoleInput, [Out] INPUT_RECORD[] lpBuffer, uint nLength, [Out] out uint lpNumberOfEventsRead);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool PeekConsoleInput([In] IntPtr hConsoleInput, [Out] INPUT_RECORD[] lpBuffer, [In] uint nLength, [Out] out uint lpNumberOfEventsRead);
 
         /// <summary>
         ///  Reads data from a console input buffer and removes it from the buffer.
@@ -38,7 +38,7 @@ namespace Ax.Engine.Core
         /// <param name="nLength">he size of the array pointed to by the <paramref name="lpBuffer"/> parameter, in array elements.</param>
         /// <param name="lpNumberOfEventsRead">A pointer to a variable that receives the number of input records read.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)] public static extern bool ReadConsoleInput(IntPtr hConsoleInput, [Out] INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+        [DllImport("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)] public static extern bool ReadConsoleInput([In] IntPtr hConsoleInput, [Out] INPUT_RECORD[] lpBuffer, [In] uint nLength, [Out] out uint lpNumberOfEventsRead);
 
         /// <summary>
         ///  Reads character and color attribute data from a rectangular block of character cells in a console screen buffer, and the function writes the data to a rectangular block at a specified location in the destination buffer.
@@ -49,7 +49,7 @@ namespace Ax.Engine.Core
         /// <param name="dwBufferCoord">The coordinates of the upper-left cell in the <paramref name="lpBuffer"/> parameter that receives the data read from the console screen buffer. The X member of the <see cref="COORD"/> structure is the column, and the Y member is the row.</param>
         /// <param name="lpReadRegion">A pointer to a <see cref="SMALL_RECT"/> structure. On input, the structure members specify the upper-left and lower-right coordinates of the console screen buffer rectangle from which the function is to read. On output, the structure members specify the actual rectangle that was used.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsoleOutput(IntPtr hConsoleOutput, [Out] CHAR_INFO[] lpBuffer, COORD dwBufferSize, COORD dwBufferCoord, [In, Out] SMALL_RECT lpReadRegion);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsoleOutput([In] IntPtr hConsoleOutput, [Out] CHAR_INFO[] lpBuffer, [In] COORD dwBufferSize, [In] COORD dwBufferCoord, [In, Out] SMALL_RECT lpReadRegion);
 
         /// <summary>
         ///  Copies a number of characters from consecutive cells of a console screen buffer, beginning at a specified location.
@@ -60,7 +60,7 @@ namespace Ax.Engine.Core
         /// <param name="dwReadCoord">The coordinates of the first cell in the console screen buffer from which to read, in characters. The X member of the <see cref="COORD"/> structure is the column, and the Y member is the row.</param>
         /// <param name="lpNumberOfCharsRead">A pointer to a variable that receives the number of characters actually read.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsoleOutputCharacter(IntPtr hConsoleOutput, [Out] StringBuilder lpCharacter, uint nLength, COORD dwReadCoord, [Out] out uint lpNumberOfCharsRead);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsoleOutputCharacter([In] IntPtr hConsoleOutput, [Out] StringBuilder lpCharacter, [In] uint nLength, [In] COORD dwReadCoord, [Out] out uint lpNumberOfCharsRead);
 
         /// <summary>
         ///  Copies a number of characters from consecutive cells of a console screen buffer, beginning at a specified location.
@@ -71,6 +71,6 @@ namespace Ax.Engine.Core
         /// <param name="dwReadCoord">The coordinates of the first cell in the console screen buffer from which to read, in characters. The X member of the <see cref="COORD"/> structure is the column, and the Y member is the row.</param>
         /// <param name="lpNumberOfAttrsRead">A pointer to a variable that receives the number of attributes actually read.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsoleOutputAttribute(IntPtr hConsoleOutput, [Out] ushort[] lpAttribute, uint nLength, COORD dwReadCoord, [Out] out uint lpNumberOfAttrsRead);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool ReadConsoleOutputAttribute([In] IntPtr hConsoleOutput, [Out] ushort[] lpAttribute, [In] uint nLength, [In] COORD dwReadCoord, [Out] out uint lpNumberOfAttrsRead);
     }
 }

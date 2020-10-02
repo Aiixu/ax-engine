@@ -5,12 +5,14 @@ namespace Ax.Engine.Core
 {
     public static partial class Native
     {
+        /// TODO : SetWindowPos
+
         /// <summary>
         ///  Retrieves the size of the largest possible console window, based on the current font and the size of the display.
         /// </summary>
         /// <param name="hConsoleOutput">A handle to the console screen buffer.</param>
         /// <returns>If the function succeeds, the return value is a <see cref="COORD"/> structure that specifies the number of character cell columns (X member) and rows (Y member) in the largest possible console window. Otherwise, the members of the structure are zero.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern COORD GetLargestConsoleWindowSize(IntPtr hConsoleOutput);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern COORD GetLargestConsoleWindowSize([In] IntPtr hConsoleOutput);
 
         /// <summary>
         /// 
@@ -19,7 +21,7 @@ namespace Ax.Engine.Core
         /// <param name="nPosition"></param>
         /// <param name="wFlags"></param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("user32.dll")] public static extern bool DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
+        [DllImport("user32.dll")] public static extern bool DeleteMenu([In] IntPtr hMenu, [In] int nPosition, [In] int wFlags);
 
         /// <summary>
         /// 
@@ -32,6 +34,6 @@ namespace Ax.Engine.Core
         /// <param name="cy"></param>
         /// <param name="flags"></param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint flags);
+        [DllImport("user32.dll")] public static extern bool SetWindowPos([In] IntPtr hWnd, [In] IntPtr hWndInsertAfter, [In] int X, [In] int Y, [In] int cx, [In] int cy, [In] uint flags);
     }
 }

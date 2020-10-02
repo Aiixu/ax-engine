@@ -21,10 +21,11 @@ namespace Ax.Engine.Core
         ///  If this parameter is zero, the signal is generated in all processes that share the console of the calling process.
         ///  </param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GenerateConsoleCtrlEvent([In] uint dwCtrlEvent, [In] uint dwProcessGroupId);
 
         /// <summary>
-        /// 
+        /// Adds or removes an application-defined HandlerRoutine function from the list of handler functions for the calling process.
+        /// If no handler function is specified, the function sets an inheritable attribute that determines whether the calling process ignores CTRL+C signals.
         /// </summary>
         /// <param name="HandlerRoutine">A pointer to the application-defined <see cref="HandlerRoutine"/> function to be added or removed. This parameter can be NULL.</param>
         /// <param name="Add"></param>

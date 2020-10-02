@@ -20,23 +20,23 @@ namespace Ax.Engine.Core
         /// <param name="dwFlags">The display mode of the console. See <see cref="CONSOLE_WINDOW_MODE"/></param>
         /// <param name="lpNewScreenBufferDimensions">A pointer to a <see cref="COORD"/> structure that receives the new dimensions of the screen buffer, in characters.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool SetConsoleDisplayMode(IntPtr hConsoleOutput, uint dwFlags, [Out, Optional] out COORD lpNewScreenBufferDimensions);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool SetConsoleDisplayMode([In] IntPtr hConsoleOutput, [In] uint dwFlags, [Out, Optional] out COORD lpNewScreenBufferDimensions);
 
         /// <summary>
         ///  Retrieves the original title for the current console window.
         /// </summary>
         /// <param name="lpConsoleTitle">A pointer to a buffer that receives a null-terminated string containing the original title.</param>
         /// <param name="nSize">The size of the <paramref name="lpConsoleTitle"/> buffer, in characters.</param>
-        /// <returns></returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern uint GetConsoleOriginalTitle([Out] out StringBuilder lpConsoleTitle, uint nSize);
+        /// <returns>If the function succeeds, the return value is the length of the string copied to the buffer, in characters.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern uint GetConsoleOriginalTitle([Out] out StringBuilder lpConsoleTitle, [In] uint nSize);
 
         /// <summary>
         ///  Retrieves the title for the current console window.
         /// </summary>
         /// <param name="lpConsoleTitle">A pointer to a buffer that receives a null-terminated string containing the title. If the buffer is too small to store the title, the function stores as many characters of the title as will fit in the buffer, ending with a null terminator.</param>
         /// <param name="nSize">The size of the buffer pointed to by the <paramref name="lpConsoleTitle"/> parameter, in characters.</param>
-        /// <returns></returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern uint GetConsoleTitle([Out] StringBuilder lpConsoleTitle, uint nSize);
+        /// <returns>If the function succeeds, the return value is the length of the console window's title, in characters.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern uint GetConsoleTitle([Out] StringBuilder lpConsoleTitle, [In] uint nSize);
 
         /// <summary>
         ///  Sets the title for the current console window.

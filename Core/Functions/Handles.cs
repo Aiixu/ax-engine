@@ -5,6 +5,8 @@ namespace Ax.Engine.Core
 {
     public static partial class Native
     {        
+        /// TODO : GetSystemMenu
+
         /// <summary>
         ///  Represents an invalid handle.
         /// </summary>
@@ -13,6 +15,7 @@ namespace Ax.Engine.Core
         /// <summary>
         ///  Retrieves the window handle used by the console associated with the calling process.
         /// </summary>
+        /// <returns>The return value is a handle to the window used by the console associated with the calling process or <see langword="null"/> if there is no such associated console.</returns>
         [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow();
 
         /// <summary>
@@ -21,7 +24,7 @@ namespace Ax.Engine.Core
         /// <param name="hWnd"></param>
         /// <param name="bRevert"></param>
         /// <returns></returns>
-        [DllImport("user32.dll")] public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+        [DllImport("user32.dll")] public static extern IntPtr GetSystemMenu([In] IntPtr hWnd, [In] bool bRevert);
 
         /// <summary>
         ///  Retrieves a handle to the specified standard device (standard input, standard output, or standard error).
@@ -32,7 +35,7 @@ namespace Ax.Engine.Core
         ///  If the function fails, the return value is <see cref="INVALID_HANDLE"/>.
         ///  If an application does not have associated standard handles, such as a service running on an interactive desktop, and has not redirected them, the return value is NULL.
         /// </returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr GetStdHandle(uint nStdHandle);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr GetStdHandle([In] uint nStdHandle);
 
         /// <summary>
         ///  Sets the handle for the specified standard device (standard input, standard output, or standard error).
