@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ax.Engine.Utils;
+using System;
 using System.Collections.Generic;
 
 using static Ax.Engine.Core.Native;
@@ -7,12 +8,16 @@ namespace Ax.Engine.Core
 {
     public sealed class InputHandler
     {
+        public const short KEY_SCREENSHOT = (short)KEY.F2;
+
         public IntPtr Handle { get => handle; }
 
         private IntPtr handle;
         private CONSOLE_MODE_INPUT inLast;
 
         private static readonly Dictionary<string, Axis> axises = new Dictionary<string, Axis>();
+
+        private static List<KEY_EVENT_RECORD> LAST_KEY_EVENTS = new List<KEY_EVENT_RECORD>();
 
         public bool Enable()
         {
@@ -50,6 +55,12 @@ namespace Ax.Engine.Core
             return numberOfEventRead;
         }
 
+        private bool GetStdIn(out IntPtr handle)
+        {
+            handle = GetStdHandle(STD_INPUT_HANDLE);
+            return handle != INVALID_HANDLE;
+        }
+
         private bool GetConsoleModeOut(IntPtr hConsoleHandle, out CONSOLE_MODE_INPUT mode)
         {
             if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
@@ -70,7 +81,22 @@ namespace Ax.Engine.Core
             }
         }
 
-        public static bool GetKey(KEY key)
+        public static Vector2 GetMousePosition()
+        {
+            return Vector2.Zero;
+        }
+
+        public static bool GetMouseButtonDown(MOUSE_BUTTON_STATE button)
+        {
+            return false;
+        }
+
+        public static bool GetMouseButton(MOUSE_BUTTON_STATE button)
+        {
+            return false;
+        }
+
+        public static bool GetMouseButtonUp(MOUSE_BUTTON_STATE button)
         {
             return false;
         }
@@ -80,15 +106,14 @@ namespace Ax.Engine.Core
             return false;
         }
 
-        public static bool GetKeyUp(KEY key)
+        public static bool GetKey(KEY key)
         {
             return false;
         }
 
-        private static bool GetStdIn(out IntPtr handle)
+        public static bool GetKeyUp(KEY key)
         {
-            handle = GetStdHandle(STD_INPUT_HANDLE);
-            return handle != INVALID_HANDLE;
+            return false;
         }
 
         public sealed class Axis

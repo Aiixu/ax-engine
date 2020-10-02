@@ -112,7 +112,11 @@
     <Compile Include="Core\YieldInstructions\WaitForMilliseconds.cs" />
     <Compile Include="Core\YieldInstructions\WaitForSeconds.cs" />
     <Compile Include="Core\YieldInstructions\WaitUntil.cs" />
+    <Compile Include="Core\YieldInstructions\WaitUntilAnyKeyDown.cs" />
+    <Compile Include="Core\YieldInstructions\WaitUntilKeyDown.cs" />
+    <Compile Include="Core\YieldInstructions\WaitUntilKeyUp.cs" />
     <Compile Include="Core\YieldInstructions\WaitWhile.cs" />
+    <Compile Include="Core\YieldInstructions\WaitWhileKeyPress.cs" />
     <Compile Include="Core\YieldInstructions\YieldInstruction.cs" />
     <Compile Include="ECS\Component.cs" />
     <Compile Include="ECS\ComponentAttributes\UniqueComponentAttribute.cs" />

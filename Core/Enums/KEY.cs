@@ -21,6 +21,11 @@
         None = 0x00,
 
         /// <summary>
+        /// Any key pressed.
+        /// </summary>
+        Any = 0xF1,
+
+        /// <summary>
         ///  The left mouse button.
         /// </summary>
         LButton = 0x01,
@@ -975,5 +980,4 @@
         /// </summary>
         Alt = 0x00040000,
     }
-}
 }

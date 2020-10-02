@@ -70,7 +70,6 @@ namespace Ax.Engine
             uint eventCount = InputHandler.Read(out INPUT_RECORD[] recs);
             FlushConsoleInputBuffer(InputHandler.Handle);
 
-            
             /*
             if(eventCount == 0) { return; }
 
