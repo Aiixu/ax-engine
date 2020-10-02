@@ -5,7 +5,7 @@
         /// <summary>
         ///  The character attributes.
         /// </summary>
-        public enum CHAR_INFO_ATTRIBUTE
+        public enum CHAR_ATTRIBUTE
         {
             /// <summary>
             ///  Text color contains blue.

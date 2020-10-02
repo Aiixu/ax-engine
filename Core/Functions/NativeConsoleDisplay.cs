@@ -10,7 +10,6 @@ namespace Ax.Engine.Core
         [DllImport("kernel32.dll", SetLastError = true)] public static extern uint GetConsoleOriginalTitle(out StringBuilder ConsoleTitle, uint Size);
         [DllImport("kernel32.dll")] public static extern bool SetConsoleTitle(string lpConsoleTitle);
 
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GetConsoleDisplayMode(out uint ModeFlags);
         [DllImport("kernel32.dll", SetLastError = true)] public static extern COORD GetLargestConsoleWindowSize(IntPtr hConsoleOutput);
 
         [DllImport("user32.dll")] public static extern bool DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);

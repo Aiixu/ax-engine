@@ -21,7 +21,7 @@ namespace Ax.Engine.Core
             [FieldOffset(0)] public char AsciiChar;
 
             /// <summary>
-            /// The character attributes. See <see cref="CHAR_INFO_ATTRIBUTE"/>
+            /// The character attributes. See <see cref="CHAR_ATTRIBUTE"/>
             /// </summary>
             [FieldOffset(2)] public ushort Attributes;
         }

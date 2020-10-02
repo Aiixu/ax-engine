@@ -24,7 +24,7 @@ namespace Ax.Engine.Core
             if (!GetStdIn(out handle)) { return false; }
             if (!GetConsoleModeOut(Handle, out inLast)) { return false; }
 
-            CONSOLE_MODE_INPUT mode = inLast | CONSOLE_MODE_INPUT.ENABLE_VIRTUALTERMINALINPUT;
+            CONSOLE_MODE_INPUT mode = inLast | CONSOLE_MODE_INPUT.ENABLE_VIRTUAL_TERMINAL_INPUT;
 
             return SetConsoleMode(Handle, (uint)mode);
         }

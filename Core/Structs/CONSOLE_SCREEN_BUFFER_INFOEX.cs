@@ -31,7 +31,7 @@ namespace Ax.Engine.Core
             public COORD dwMaximumWindowSize;
 
             /// <summary>
-            ///  The attributes of the characters written to a screen buffer by the WriteFile and <see cref="WriteConsole(System.IntPtr, byte[], int, out int, System.IntPtr)"/></see> functions, or echoed to a screen buffer by the ReadFile and ReadConsole functions. For more information, see <see cref="CHAR_INFO_ATTRIBUTE"/>.
+            ///  The attributes of the characters written to a screen buffer by the WriteFile and <see cref="WriteConsole(System.IntPtr, byte[], int, out int, System.IntPtr)"/></see> functions, or echoed to a screen buffer by the ReadFile and ReadConsole functions. For more information, see <see cref="CHAR_ATTRIBUTE"/>.
             /// </summary>
             public short wAttributes;
 

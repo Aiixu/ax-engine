@@ -77,11 +77,11 @@ namespace Ax.Engine.Core
             if (!GetConsoleModeIn(Handle, out outLast)) { return false; }
 
             // Output mode
-            CONSOLE_MODE_OUTPUT mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUALTERMINALPROCESSING;
+            CONSOLE_MODE_OUTPUT mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
-            if (disableNewLineAutoReturn) { mode |= CONSOLE_MODE_OUTPUT.DISABLE_NEWLINEAUTORETURN; }
+            if (disableNewLineAutoReturn) { mode |= CONSOLE_MODE_OUTPUT.DISABLE_NEWLINE_AUTO_RETURN; }
 
-            mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUALTERMINALPROCESSING;
+            mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
             // Font
             lastFont = new CONSOLE_FONT_INFO_EX();

@@ -11,8 +11,7 @@ namespace Ax.Engine.Core
         [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GetConsoleScreenBufferInfoEx(IntPtr hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfo);
         [DllImport("kernel32.dll", SetLastError = true)] public static extern bool SetConsoleScreenBufferInfoEx(IntPtr ConsoleOutput, CONSOLE_SCREEN_BUFFER_INFOEX ConsoleScreenBufferInfoEx);
 
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr CreateConsoleScreenBuffer(uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwFlags, IntPtr lpScreenBufferData);
-
+        
         [DllImport("kernel32.dll", SetLastError = true)] public static extern bool SetConsoleTextAttribute(IntPtr hConsoleOutput, ushort wAttributes);
     }
 }
