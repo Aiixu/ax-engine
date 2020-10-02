@@ -61,7 +61,7 @@ namespace Ax.Engine.Core
         private IntPtr handle;
         private CONSOLE_MODE_OUTPUT outLast;
 
-        internal CONSOLE_FONT_INFO_EX lastFont;
+        internal CONSOLE_FONT_INFOEX lastFont;
 
         private Stopwatch calculationStopwatch;
         private Stopwatch releaseStopwatch;
@@ -84,14 +84,14 @@ namespace Ax.Engine.Core
             mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
             // Font
-            lastFont = new CONSOLE_FONT_INFO_EX();
+            lastFont = new CONSOLE_FONT_INFOEX();
             GetCurrentConsoleFontEx(handle, false, ref lastFont);
 
             Default(ref fontName, StringNotNullOrEmpty, lastFont.FaceName);
             Default(ref fontWidth, IntegerPositive, lastFont.dwFontSize.X);
             Default(ref fontHeight, IntegerPositive, lastFont.dwFontSize.Y);
 
-            CONSOLE_FONT_INFO_EX newFont = new CONSOLE_FONT_INFO_EX();
+            CONSOLE_FONT_INFOEX newFont = new CONSOLE_FONT_INFOEX();
 
             newFont.cbSize = (uint)Marshal.SizeOf(newFont);
             newFont.FaceName = fontName;

@@ -13,6 +13,7 @@ namespace Ax.Engine.Core
         /// <param name="nLength">The number of character cells to be set to the specified color attributes.</param>
         /// <param name="dwWriteCoord">A <see cref="COORD"/> structure that specifies the character coordinates of the first cell whose attributes are to be set.</param>
         /// <param name="lpNumberOfAttrsWritten">A pointer to a variable that receives the number of character cells whose attributes were actually set.</param>
+        /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
         [DllImport("kernel32.dll", SetLastError = true)] public static extern bool FillConsoleOutputAttribute(IntPtr hConsoleOutput, ushort wAttribute, uint nLength, COORD dwWriteCoord, out uint lpNumberOfAttrsWritten);
 
         /// <summary>
@@ -23,6 +24,7 @@ namespace Ax.Engine.Core
         /// <param name="nLength">The number of character cells to which the character should be written.</param>
         /// <param name="dwWriteCoord">A <see cref="COORD"/> structure that specifies the character coordinates of the first cell to which the character is to be written.</param>
         /// <param name="lpNumberOfCharsWritten">A pointer to a variable that receives the number of characters actually written to the console screen buffer.</param>
+        /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
         [DllImport("kernel32.dll", SetLastError = true)] public static extern bool FillConsoleOutputCharacter(IntPtr hConsoleOutput, char cCharacter, uint nLength, COORD dwWriteCoord, out uint lpNumberOfCharsWritten);
     }
 }

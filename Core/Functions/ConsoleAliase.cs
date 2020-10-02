@@ -11,7 +11,7 @@ namespace Ax.Engine.Core
         /// <param name="Source">The console alias to be mapped to the text specified by <i>Target</i>.</param>
         /// <param name="Target">The text to be substituted for <i>Source</i>. If this parameter is <see langword="null"/>, then the console alias is removed.</param>
         /// <param name="ExeName">The name of the executable file for which the console alias is to be defined.</param>
-        /// <returns></returns>
+        /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
         [DllImport("kernel32", SetLastError = true)] public static extern bool AddConsoleAlias(string Source, string Target, string ExeName);
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Ax.Engine.Core
         /// <param name="lpTargetBuffer">A pointer to a buffer that receives the text associated with the console alias.</param>
         /// <param name="TargetBufferLength">The size of the buffer pointed to by lpTargetBuffer, in bytes.</param>
         /// <param name="lpExeName">The name of the executable file.</param>
-        /// <returns></returns>
+        /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
         [DllImport("kernel32.dll", SetLastError = true)] public static extern bool GetConsoleAlias(string lpSource, [Out] out StringBuilder lpTargetBuffer, uint TargetBufferLength, string lpExeName);
 
         /// <summary>

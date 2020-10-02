@@ -8,7 +8,7 @@ namespace Ax.Engine.Core
         ///  Contains extended information for a console font.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct CONSOLE_FONT_INFO_EX
+        public struct CONSOLE_FONT_INFOEX
         {
             /// <summary>
             ///  The size of this structure, in bytes.

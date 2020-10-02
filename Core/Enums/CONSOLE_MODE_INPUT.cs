@@ -52,8 +52,6 @@
             /// </summary>
             ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200,
 
-
-
             ENABLE_EXTENDED_FLAGS = 0x80,
             ENABLE_AUTO_POSITION = 0x100,
         }
