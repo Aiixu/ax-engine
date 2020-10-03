@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 
 using Ax.Engine.Core;
@@ -102,25 +103,29 @@ namespace Ax.Engine
             Default(ref WindowTop, IntegerPositiveOrZero, Console.WindowTop);
             Default(ref DebugFolderPath, StringNotNullOrEmpty, "logs");
 
+            Logger.DebugFolderPath = DebugFolderPath;
+            StringBuilder logger = new StringBuilder();
+
             bool isRunning = true;
 
             IntPtr hWnd = GetConsoleWindow();
             IntPtr hMenu = GetSystemMenu(hWnd, false);
 
-            isRunning &= DeleteMenu(hMenu, (int)SC.MINIMIZE, (int)MF.BYCOMMAND);
-            isRunning &= DeleteMenu(hMenu, (int)SC.MAXIMIZE, (int)MF.BYCOMMAND);
-            isRunning &= DeleteMenu(hMenu, (int)SC.SIZE, (int)MF.BYCOMMAND);
+            logger.AppendLine($"HWND           {hWnd}");
+            logger.AppendLine($"HMENU          {hMenu}");
+            
+            logger.AppendLine($"DELMENU_MIN    {isRunning &= DeleteMenu(hMenu, (int)SC.MINIMIZE, (int)MF.BYCOMMAND)}");
+            logger.AppendLine($"DELMENU_MAX    {isRunning &= DeleteMenu(hMenu, (int)SC.MAXIMIZE, (int)MF.BYCOMMAND)}");
+            logger.AppendLine($"DELMENU_SIZ    {isRunning &= DeleteMenu(hMenu, (int)SC.SIZE, (int)MF.BYCOMMAND)}");
 
             OutputHandler outputHandler = new OutputHandler();
             InputHandler inputHandler = new InputHandler();
 
-            isRunning &= SetWindowPos(hWnd, new IntPtr(0), WindowLeft, WindowTop, 0, 0, flags | (uint)SWP.SHOWWINDOW | (uint)SWP.NOSIZE);
-            isRunning &= SetConsoleTitle(WindowName);
+            logger.AppendLine($"SETWINPOS      {isRunning &= SetWindowPos(hWnd, new IntPtr(0), WindowLeft, WindowTop, 0, 0, flags | (uint)SWP.SHOWWINDOW | (uint)SWP.NOSIZE)}");
+            logger.AppendLine($"SETWINTXT      {isRunning &= SetConsoleTitle(WindowName)}");
 
-            isRunning &= inputHandler.Enable();
-            isRunning &= outputHandler.Enable(RenderingMode, FontName, FontWidth, FontHeight, CursorVisible, disableNewLineAutoReturn, 1000 / FPS);
-
-            Logger.DebugFolderPath = DebugFolderPath;
+            logger.AppendLine($"INHANDLER      {isRunning &= inputHandler.Enable(ref logger)}");
+            logger.AppendLine($"OUTHANDLER     {outputHandler.Enable(ref logger, RenderingMode, FontName, FontWidth, FontHeight, CursorVisible, disableNewLineAutoReturn, 1000 / FPS)}");
 
             Console.SetWindowSize(WindowWidth, WindowHeight);
             Console.SetBufferSize(WindowWidth, WindowHeight);
@@ -135,6 +140,8 @@ namespace Ax.Engine
 
             Game.FontWidth = FontWidth;
             Game.FontHeight = FontHeight;
+
+            Logger.Write(logger.ToString());
 
             return new Game(hWnd, hMenu, outputHandler, inputHandler, isRunning);
         }

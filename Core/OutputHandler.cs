@@ -71,10 +71,13 @@ namespace Ax.Engine.Core
         public static Color ClearColor = Color.Black;
 
         // TODO : fontHeight
-        public bool Enable(RenderingMode renderingMode, string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn, int frameDelay)
+        public bool Enable(ref StringBuilder logger, RenderingMode renderingMode, string fontName, int fontWidth, int fontHeight, bool cursorVisible, bool disableNewLineAutoReturn, int frameDelay)
         {
-            if (!GetStdOut(out handle)) { return false; }
-            if (!GetConsoleModeIn(Handle, out outLast)) { return false; }
+            bool stdOut;
+            logger.AppendLine($"GETSTDOUT      {stdOut = GetStdOut(out handle)}");
+
+            if (!stdOut) { return false; }
+            if (!GetConsoleModeOut(Handle, ref logger, out outLast)) { return false; }
 
             // Output mode
             CONSOLE_MODE_OUTPUT mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
@@ -83,9 +86,12 @@ namespace Ax.Engine.Core
 
             mode = outLast | CONSOLE_MODE_OUTPUT.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
+            logger.AppendLine($"OUTLAST        {outLast}");
+            logger.AppendLine($"OUTMODE        {mode}");
+
             // Font
             lastFont = new CONSOLE_FONT_INFOEX();
-            GetCurrentConsoleFontEx(handle, false, ref lastFont);
+            logger.AppendLine($"GETFONT        {GetCurrentConsoleFontEx(handle, false, ref lastFont)}");
 
             Default(ref fontName, StringNotNullOrEmpty, lastFont.FaceName);
             Default(ref fontWidth, IntegerPositive, lastFont.dwFontSize.X);
@@ -98,7 +104,7 @@ namespace Ax.Engine.Core
             newFont.dwFontSize.X = (short)fontWidth;
             newFont.dwFontSize.Y = (short)fontHeight;
 
-            SetCurrentConsoleFontEx(GetStdHandle((uint)HANDLE.STD_OUTPUT_HANDLE), false, ref newFont);
+            logger.AppendLine($"SETFONT        {SetCurrentConsoleFontEx(GetStdHandle((uint)HANDLE.STD_OUTPUT_HANDLE), false, ref newFont)}");
             
             calculationStopwatch = new Stopwatch();
             releaseStopwatch = new Stopwatch();
@@ -112,7 +118,10 @@ namespace Ax.Engine.Core
             OutputHandler.renderingMode = renderingMode;
             Console.CursorVisible = cursorVisible;
 
-            return SetConsoleMode(Handle, (uint)mode);
+            bool cMode;
+            logger.AppendLine($"SETCMODEOUT    {cMode = SetConsoleMode(Handle, (uint)mode)}");
+
+            return cMode;
         }
 
         public void WaitFrame()
@@ -423,9 +432,12 @@ namespace Ax.Engine.Core
             return handle != INVALID_HANDLE;
         }
 
-        private bool GetConsoleModeIn(IntPtr hConsoleHandle, out CONSOLE_MODE_OUTPUT mode)
+        private bool GetConsoleModeOut(IntPtr hConsoleHandle, ref StringBuilder logger, out CONSOLE_MODE_OUTPUT mode)
         {
-            if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
+            bool cMode;
+            logger.AppendLine($"GETCMODEOUT    {cMode = GetConsoleMode(hConsoleHandle, out uint lpMode)}");
+
+            if (!cMode)
             {
                 mode = 0;
                 return false;

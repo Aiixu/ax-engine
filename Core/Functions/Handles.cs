@@ -19,14 +19,6 @@ namespace Ax.Engine.Core
         [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow();
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hWnd"></param>
-        /// <param name="bRevert"></param>
-        /// <returns></returns>
-        [DllImport("user32.dll")] public static extern IntPtr GetSystemMenu([In] IntPtr hWnd, [In] bool bRevert);
-
-        /// <summary>
         ///  Retrieves a handle to the specified standard device (standard input, standard output, or standard error).
         /// </summary>
         /// <param name="nStdHandle">The standard device. See <see cref="HANDLE"/>.</param>

@@ -75,8 +75,10 @@
     <Compile Include="Core\Enums\CONTROL_KEY_STATE.cs" />
     <Compile Include="Core\Enums\CTRL_EVENT.cs" />
     <Compile Include="Core\Enums\HANDLE.cs" />
+    <Compile Include="Core\Enums\HWND.cs" />
     <Compile Include="Core\Enums\INPUT_RECORD_EVENT_TYPE.cs" />
     <Compile Include="Core\Enums\KEY.cs" />
+    <Compile Include="Core\Enums\MF.cs" />
     <Compile Include="Core\Enums\MOUSE_BUTTON_STATE.cs" />
     <Compile Include="Core\Enums\MOUSE_EVENT_FLAGS.cs" />
     <Compile Include="Core\Functions\ConsoleAliase.cs" />
@@ -99,11 +101,10 @@
     <Compile Include="Core\Enums\CONSOLE_MODE_OUTPUT.cs" />
     <Compile Include="Core\Enums\CTRL_TYPES.cs" />
     <Compile Include="Core\Enums\LF.cs" />
-    <Compile Include="Core\Enums\NativeSC.cs" />
-    <Compile Include="Core\Enums\NativeSCF.cs" />
-    <Compile Include="Core\Enums\NativeSWP.cs" />
-    <Compile Include="Core\Enums\NativeTMPF.cs" />
-    <Compile Include="Core\Functions\NativeConsoleDisplay.cs" />
+    <Compile Include="Core\Enums\SC.cs" />
+    <Compile Include="Core\Enums\SCF.cs" />
+    <Compile Include="Core\Enums\SWP.cs" />
+    <Compile Include="Core\Enums\TMPF.cs" />
     <Compile Include="Core\Functions\ConsoleText.cs" />
     <Compile Include="Core\Functions\ConsoleWindow.cs" />
     <Compile Include="Core\Functions\ConsoleRead.cs" />

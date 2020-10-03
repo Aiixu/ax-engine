@@ -1,7 +1,8 @@
-﻿using Ax.Engine.Utils;
-using System;
+﻿using System;
+using System.Text;
 using System.Collections.Generic;
 
+using Ax.Engine.Utils;
 using static Ax.Engine.Core.Native;
 
 namespace Ax.Engine.Core
@@ -17,16 +18,29 @@ namespace Ax.Engine.Core
 
         private static readonly Dictionary<string, Axis> axises = new Dictionary<string, Axis>();
 
-        private static List<KEY_EVENT_RECORD> LAST_KEY_EVENTS = new List<KEY_EVENT_RECORD>();
+        private static Dictionary<ushort, bool> LAST_KEY_STATES = new Dictionary<ushort, bool>();
+        private static Dictionary<ushort, bool> CURRENT_KEY_STATES = new Dictionary<ushort, bool>();
 
-        public bool Enable()
+        private static List<KEY_EVENT_RECORD> LAST_KEY_EVENTS = new List<KEY_EVENT_RECORD>();
+        private static List<MOUSE_EVENT_RECORD> LAST_MOUSE_EVENTS = new List<MOUSE_EVENT_RECORD>();
+
+        public bool Enable(ref StringBuilder logger)
         {
-            if (!GetStdIn(out handle)) { return false; }
-            if (!GetConsoleModeOut(Handle, out inLast)) { return false; }
+            bool stdIn;
+            logger.AppendLine($"GETSTDIN       {stdIn = GetStdIn(out handle)}");
+
+            if (!stdIn) { return false; }
+            if (!GetConsoleModeIn(Handle, ref logger, out inLast)) { return false; }
 
             CONSOLE_MODE_INPUT mode = inLast | CONSOLE_MODE_INPUT.ENABLE_VIRTUAL_TERMINAL_INPUT;
 
-            return SetConsoleMode(Handle, (uint)mode);
+            logger.AppendLine($"INLAST         {inLast}");
+            logger.AppendLine($"INMODE         {mode}");
+
+            bool cMode;
+            logger.AppendLine($"SETCMODEIN     {cMode = SetConsoleMode(Handle, (uint)mode)}");
+
+            return cMode;
         }
 
         public bool Disable()
@@ -55,15 +69,34 @@ namespace Ax.Engine.Core
             return numberOfEventRead;
         }
 
+        internal void UpdateEventRegistry(INPUT_RECORD[] rec)
+        {
+            LAST_KEY_STATES = new Dictionary<ushort, bool>(CURRENT_KEY_STATES);
+            CURRENT_KEY_STATES.Clear();
+
+            for (int i = 0; i < rec.Length; i++)
+            {
+                switch(rec[i].EventType)
+                {
+                    case (ushort)INPUT_RECORD_EVENT_TYPE.KEY_EVENT:
+                        CURRENT_KEY_STATES[rec[i].KeyEvent.wVirtualKeyCode] = rec[i].KeyEvent.bKeyDown;
+                        break;
+                }
+            }
+        }
+
         private bool GetStdIn(out IntPtr handle)
         {
             handle = GetStdHandle((uint)HANDLE.STD_INPUT_HANDLE);
             return handle != INVALID_HANDLE;
         }
 
-        private bool GetConsoleModeOut(IntPtr hConsoleHandle, out CONSOLE_MODE_INPUT mode)
+        private bool GetConsoleModeIn(IntPtr hConsoleHandle, ref StringBuilder logger, out CONSOLE_MODE_INPUT mode)
         {
-            if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
+            bool cMode;
+            logger.AppendLine($"GETCMODEIN     {cMode = GetConsoleMode(hConsoleHandle, out uint lpMode)}");
+
+            if (!cMode)
             {
                 mode = 0;
                 return false;
@@ -103,17 +136,25 @@ namespace Ax.Engine.Core
 
         public static bool GetKeyDown(KEY key)
         {
-            return false;
+            ushort vkKey = (ushort)key;
+            return (!LAST_KEY_STATES.ContainsKey(vkKey) || !LAST_KEY_STATES[vkKey]) && GetKey(key);
         }
 
         public static bool GetKey(KEY key)
         {
-            return false;
+            ushort vkKey = (ushort)key;
+            return CURRENT_KEY_STATES.ContainsKey(vkKey) && CURRENT_KEY_STATES[vkKey];
         }
 
         public static bool GetKeyUp(KEY key)
         {
-            return false;
+            ushort vkKey = (ushort)key;
+            return LAST_KEY_STATES.ContainsKey(vkKey) && LAST_KEY_STATES[vkKey] && !GetKey(key);
+        }
+
+        public static int GetAxis(string axisName)
+        {
+            return 0;
         }
 
         public sealed class Axis

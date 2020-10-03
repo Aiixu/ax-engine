@@ -37,6 +37,15 @@ namespace Ax.Engine
             animatedCharacter.animationDelay = 0;
             animatedCharacter.Transform.position = new Vector2(5, 0);
             
+            IEnumerator TestInput()
+            {
+                yield return new WaitUntilKeyDown(KEY.A);
+
+                Console.WriteLine("a");
+            }
+
+            Yielder.StartCoroutine(TestInput());
+
             while (game.IsRunning)
             {
                 game.HandleEvents();
