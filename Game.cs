@@ -68,7 +68,7 @@ namespace Ax.Engine
 
             // Capture events
             uint eventCount = InputHandler.Read(out INPUT_RECORD[] recs);
-            FlushConsoleInputBuffer(InputHandler.Handle);
+            InputHandler.UpdateInputStates(recs);
 
             /*
             if(eventCount == 0) { return; }
@@ -102,6 +102,7 @@ namespace Ax.Engine
             Console.WriteLine(Logger.GenTable(inputTable));
             */
 
+            return;
             for (int i = 0; i < eventCount; i++)
             {
                 // Process built-in events
@@ -194,9 +195,12 @@ namespace Ax.Engine
                 EntityManager.Render(OutputHandler);
             }
 
-            OutputHandler.WaitFrame();
-
             OutputHandler.ReleaseSurface();
+        }
+
+        public void WaitFrame()
+        {
+            OutputHandler.WaitFrame();
         }
 
         public bool Clean()

@@ -18,11 +18,10 @@ namespace Ax.Engine.Core
 
         private static readonly Dictionary<string, Axis> axises = new Dictionary<string, Axis>();
 
-        private static Dictionary<ushort, bool> LAST_KEY_STATES = new Dictionary<ushort, bool>();
-        private static Dictionary<ushort, bool> CURRENT_KEY_STATES = new Dictionary<ushort, bool>();
+        private static Dictionary<char, bool> lastKeyStates = new Dictionary<char, bool>();
+        private static Dictionary<char, bool> currentKeyStates = new Dictionary<char, bool>();
 
-        private static List<KEY_EVENT_RECORD> LAST_KEY_EVENTS = new List<KEY_EVENT_RECORD>();
-        private static List<MOUSE_EVENT_RECORD> LAST_MOUSE_EVENTS = new List<MOUSE_EVENT_RECORD>();
+        private static Dictionary<char, Action> keyEvents = new Dictionary<char, Action>();
 
         public bool Enable(ref StringBuilder logger)
         {
@@ -69,17 +68,17 @@ namespace Ax.Engine.Core
             return numberOfEventRead;
         }
 
-        internal void UpdateEventRegistry(INPUT_RECORD[] rec)
+        internal void UpdateInputStates(INPUT_RECORD[] rec)
         {
-            LAST_KEY_STATES = new Dictionary<ushort, bool>(CURRENT_KEY_STATES);
-            CURRENT_KEY_STATES.Clear();
+            lastKeyStates = new Dictionary<char, bool>(currentKeyStates);
+            currentKeyStates.Clear();
 
             for (int i = 0; i < rec.Length; i++)
             {
                 switch(rec[i].EventType)
                 {
                     case (ushort)INPUT_RECORD_EVENT_TYPE.KEY_EVENT:
-                        CURRENT_KEY_STATES[rec[i].KeyEvent.wVirtualKeyCode] = rec[i].KeyEvent.bKeyDown;
+                        currentKeyStates[rec[i].KeyEvent.UnicodeChar] = rec[i].KeyEvent.bKeyDown;
                         break;
                 }
             }
@@ -134,22 +133,37 @@ namespace Ax.Engine.Core
             return false;
         }
 
-        public static bool GetKeyDown(KEY key)
+        public static bool GetKeyDown(KEY key, bool caseSensitive = false)
         {
-            ushort vkKey = (ushort)key;
-            return (!LAST_KEY_STATES.ContainsKey(vkKey) || !LAST_KEY_STATES[vkKey]) && GetKey(key);
+            char chKey = (char)key;
+            return caseSensitive ? GetKeyDown(chKey) : GetKeyDown(char.ToUpper(chKey)) || GetKeyDown(char.ToLower(chKey));
+        }
+
+        public static bool GetKeyDown(char chKey)
+        {
+            return (!lastKeyStates.ContainsKey(chKey) || !lastKeyStates[chKey]) && GetKey(chKey);
         }
 
         public static bool GetKey(KEY key)
         {
-            ushort vkKey = (ushort)key;
-            return CURRENT_KEY_STATES.ContainsKey(vkKey) && CURRENT_KEY_STATES[vkKey];
+            char chKey = (char)key;
+            return GetKey(chKey);
+        }
+
+        public static bool GetKey(char chKey)
+        {
+            return currentKeyStates.ContainsKey(chKey) && currentKeyStates[chKey];
         }
 
         public static bool GetKeyUp(KEY key)
         {
-            ushort vkKey = (ushort)key;
-            return LAST_KEY_STATES.ContainsKey(vkKey) && LAST_KEY_STATES[vkKey] && !GetKey(key);
+            char chKey = (char)key;
+            return GetKeyUp(chKey);
+        }
+
+        public static bool GetKeyUp(char chKey)
+        {
+            return lastKeyStates.ContainsKey(chKey) && lastKeyStates[chKey] && !GetKey(chKey);
         }
 
         public static int GetAxis(string axisName)

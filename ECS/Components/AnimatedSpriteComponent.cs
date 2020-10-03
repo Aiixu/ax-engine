@@ -86,7 +86,7 @@ namespace Ax.Engine.ECS.Components
 
             for (int i = 0; i < frames.Length; i++)
             {
-                Bitmap bmp = (Bitmap)Image.FromFile(rawFrames[i]);                
+                using Bitmap bmp = (Bitmap)Image.FromFile(rawFrames[i]);
                 frames[i] = new Bitmap(bmp, frameSize.x, frameSize.y);
             }
         }

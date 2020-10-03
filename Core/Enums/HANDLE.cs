@@ -10,12 +10,12 @@
             /// <summary>
             ///  The standard input device.
             /// </summary>
-            STD_INPUT_HANDLE = unchecked((uint)-11),
+            STD_INPUT_HANDLE = unchecked((uint)-10),
 
             /// <summary>
             ///  The standard output device.
             /// </summary>
-            STD_OUTPUT_HANDLE = unchecked((uint)-10),
+            STD_OUTPUT_HANDLE = unchecked((uint)-11),
 
             /// <summary>
             ///  The standard error device.

@@ -1,12 +1,10 @@
 ﻿using System;
+using System.Collections;
 
 using Ax.Engine.Core;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
-using System.Linq;
-using System.Threading;
-using System.Collections;
 
 namespace Ax.Engine
 {
@@ -39,7 +37,7 @@ namespace Ax.Engine
             
             IEnumerator TestInput()
             {
-                yield return new WaitUntilKeyDown(KEY.A);
+                yield return new WaitUntilKeyDown(KEY.F2);
 
                 Console.WriteLine("a");
             }
@@ -51,6 +49,10 @@ namespace Ax.Engine
                 game.HandleEvents();
                 game.Update();
                 //game.Render();
+
+                //Console.WriteLine(InputHandler.GetKey(KEY.A));
+
+                game.WaitFrame();
             }
 
             game.Clean();
