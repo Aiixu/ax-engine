@@ -67,8 +67,16 @@ namespace Ax.Engine
             if (!IsRunning) { return; }
 
             // Capture events
-            uint eventCount = InputHandler.Read(out INPUT_RECORD[] recs);
+            uint eventCount = InputHandler.Peek(out INPUT_RECORD[] recs);
             InputHandler.UpdateInputStates(recs);
+            FlushConsoleInputBuffer(OutputHandler.Handle);
+
+            // Built-in event handling
+
+            if(InputHandler.GetKeyDown(KEY.F12) && !OutputHandler.LastFrameData.Equals(default(OutputHandler.RenderData)))
+            {
+                new Thread(() => TakeScreenshot(OutputHandler.LastFrameData.Surface)).Start();
+            }
 
             /*
             if(eventCount == 0) { return; }
@@ -103,29 +111,9 @@ namespace Ax.Engine
             */
 
             return;
-            for (int i = 0; i < eventCount; i++)
-            {
-                // Process built-in events
-                switch(recs[i].EventType)
-                {
-                    // Keyboard
-                    case 1:
-                        switch(recs[i].KeyEvent.wVirtualKeyCode)
-                        {
-                            // F2
-                            case 113:
-                                if (OutputHandler.LastFrameData.Equals(default(OutputHandler.RenderData))) { continue; }
-
-                                new Thread(() => TakeScreeshot(OutputHandler.LastFrameData.Surface)).Start();
-                                break;
-                        }
-
-                        break;
-                }
-            }
         }
 
-        public void TakeScreeshot(OutputHandler.SurfaceItem[,] surface)
+        public void TakeScreenshot(OutputHandler.SurfaceItem[,] surface)
         {
             if (!Directory.Exists("screenshots")) { Directory.CreateDirectory("screenshots"); }
 

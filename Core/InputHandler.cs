@@ -21,7 +21,20 @@ namespace Ax.Engine.Core
         private static Dictionary<char, bool> lastKeyStates = new Dictionary<char, bool>();
         private static Dictionary<char, bool> currentKeyStates = new Dictionary<char, bool>();
 
-        private static Dictionary<char, Action> keyEvents = new Dictionary<char, Action>();
+        private static Func<char, bool>[] keyEventsCheck = new Func<char, bool>[] { GetKeyDown, GetKey, GetKeyUp };
+        private static Dictionary<char, EventHandler>[] keyEvents = new Dictionary<char, EventHandler>[3]
+        {
+            new Dictionary<char, EventHandler>(),
+            new Dictionary<char, EventHandler>(),
+            new Dictionary<char, EventHandler>()
+        };
+
+        public enum KeyEventType : int
+        {
+            KeyDown = 0,
+            KeyPress = 1,
+            KeyUp = 2
+        }
 
         public bool Enable(ref StringBuilder logger)
         {
@@ -82,6 +95,17 @@ namespace Ax.Engine.Core
                         break;
                 }
             }
+
+            for (int i = 0; i < keyEvents.Length; i++)
+            {
+                foreach (KeyValuePair<char, EventHandler> keyEvent in keyEvents[i])
+                {
+                    if (keyEventsCheck[i].Invoke(keyEvent.Key))
+                    {
+                        keyEvent.Value.Invoke(null, null);
+                    }
+                }
+            }
         }
 
         private bool GetStdIn(out IntPtr handle)
@@ -113,6 +137,7 @@ namespace Ax.Engine.Core
             }
         }
 
+        #region Mouse Input
         public static Vector2 GetMousePosition()
         {
             return Vector2.Zero;
@@ -132,7 +157,9 @@ namespace Ax.Engine.Core
         {
             return false;
         }
+        #endregion
 
+        #region Keyboard Input
         public static bool GetKeyDown(KEY key, bool caseSensitive = false)
         {
             char chKey = (char)key;
@@ -165,6 +192,50 @@ namespace Ax.Engine.Core
         {
             return lastKeyStates.ContainsKey(chKey) && lastKeyStates[chKey] && !GetKey(chKey);
         }
+        #endregion
+
+        #region Keyboard Input Events
+        public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, params KEY[] keys)
+        {
+            RegisterKeyEvent(keyEventType, callback, false, keys);;
+        }
+
+        public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, bool caseSensitive, params KEY[] keys)
+        {
+            List<char> chKeys = new List<char>();
+
+            for (int i = 0; i < keys.Length; i++)
+            {
+                char chKey = (char)keys[i];
+                if (caseSensitive)
+                {
+                    chKeys.Add(chKey);
+                }
+                else
+                {
+                    chKeys.Add(char.ToLower(chKey));
+                    chKeys.Add(char.ToUpper(chKey));
+                }
+            }
+
+            RegisterKeyEvent(keyEventType, callback, chKeys.ToArray());
+        }
+
+        public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, params char[] keys)
+        {
+            int registryIndex = (int)keyEventType;
+
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (!keyEvents[registryIndex].ContainsKey(keys[i]))
+                {
+                    keyEvents[registryIndex].Add(keys[i], null);
+                }
+
+                keyEvents[registryIndex][keys[i]] += (object sender, EventArgs e) => callback();
+            }
+        }
+        #endregion
 
         public static int GetAxis(string axisName)
         {
