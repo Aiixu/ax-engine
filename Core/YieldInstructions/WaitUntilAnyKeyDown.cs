@@ -6,7 +6,7 @@ namespace Ax.Engine.Core
     {
         internal override IEnumerator Routine()
         {
-            yield return new WaitUntil(() => InputHandler.GetKeyDown(KEY.Any));
+            yield return new WaitUntil(() => GameInput.GetKeyDown(KEY.Any));
         }
     }
 }

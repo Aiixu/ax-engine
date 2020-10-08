@@ -8,6 +8,11 @@
         public enum MOUSE_EVENT_FLAGS : uint
         {
             /// <summary>
+            ///  The event is a button click or release.
+            /// </summary>
+            CLICK_OR_RELEASE = 0x0,
+
+            /// <summary>
             ///  The second click (button press) of a double-click occurred. The first click is returned as a regular button-press event.
             /// </summary>
             DOUBLE_CLICK = 0x0002,

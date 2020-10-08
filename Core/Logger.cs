@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Ax.Engine.Core
 {
+    // Logger.Operate<T, TArg1>(string label, out T result, Func<TArg1, T> func);
     public static class Logger
     {
         public static string DebugFolderPath { get; internal set; }

@@ -16,7 +16,7 @@ namespace Ax.Engine.Core
             public COORD dwMousePosition;
 
             /// <summary>
-            ///  The status of the mouse buttons. The least significant bit corresponds to the leftmost mouse button. The next least significant bit corresponds to the rightmost mouse button. The next bit indicates the next-to-leftmost mouse button. The bits then correspond left to right to the mouse buttons. A bit is 1 if the button was pressed. See <see cref="MOUSE_BUTTON_STATE"/>
+            ///  The status of the mouse buttons. The least significant bit corresponds to the leftmost mouse button. The next least significant bit corresponds to the rightmost mouse button. The next bit indicates the next-to-leftmost mouse button. The bits then correspond left to right to the mouse buttons. A bit is 1 if the button was pressed. See <see cref="MOUSE_BUTTON"/>
             /// </summary>
             public uint dwButtonState;
 
@@ -26,7 +26,7 @@ namespace Ax.Engine.Core
             public uint dwControlKeyState;
 
             /// <summary>
-            ///  The type of mouse event. If this value is zero, it indicates a mouse button being pressed or released. <see cref="MOUSE_EVENT_FLAGS"/>
+            ///  The type of mouse event. If this value is zero, it indicates a mouse button being pressed or released. See <see cref="MOUSE_EVENT_FLAGS"/>.
             /// </summary>
             public uint dwEventFlags;
         }

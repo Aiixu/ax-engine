@@ -79,7 +79,7 @@
     <Compile Include="Core\Enums\INPUT_RECORD_EVENT_TYPE.cs" />
     <Compile Include="Core\Enums\KEY.cs" />
     <Compile Include="Core\Enums\MF.cs" />
-    <Compile Include="Core\Enums\MOUSE_BUTTON_STATE.cs" />
+    <Compile Include="Core\Enums\MOUSE_BUTTON.cs" />
     <Compile Include="Core\Enums\MOUSE_EVENT_FLAGS.cs" />
     <Compile Include="Core\Functions\ConsoleAliase.cs" />
     <Compile Include="Core\Functions\ConsoleCursor.cs" />
@@ -152,6 +152,7 @@
     <Compile Include="ECS\EntityManager.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameBuilder.cs" />
+    <Compile Include="GameInput.cs" />
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Utils\DefaultValue.cs" />
     <Compile Include="Utils\MathHelper.cs" />

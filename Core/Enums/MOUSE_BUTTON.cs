@@ -5,7 +5,7 @@
         /// <summary>
         ///  The status of the mouse buttons.
         /// </summary>
-        public enum MOUSE_BUTTON_STATE : uint
+        public enum MOUSE_BUTTON : uint
         {
             /// <summary>
             ///  The leftmost mouse button.
@@ -30,7 +30,17 @@
             /// <summary>
             ///  The rightmost mouse button.
             /// </summary>
-            RIGHTMOST_BUTTON_PRESSED = 0x0002
+            RIGHTMOST_BUTTON_PRESSED = 0x0002,
+
+            /// <summary>
+            ///  The mouse wheel (up).
+            /// </summary>
+            WHEEL_UP = 7864320,
+
+            /// <summary>
+            ///  The mouse wheel (down).
+            /// </summary>
+            WHEEL_DOWN = 4287102976
         }
     }
 }

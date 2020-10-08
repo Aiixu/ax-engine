@@ -67,13 +67,12 @@ namespace Ax.Engine
             if (!IsRunning) { return; }
 
             // Capture events
-            uint eventCount = InputHandler.Peek(out INPUT_RECORD[] recs);
+            uint eventCount = InputHandler.Read(out INPUT_RECORD[] recs);
             InputHandler.UpdateInputStates(recs);
-            FlushConsoleInputBuffer(OutputHandler.Handle);
+            //FlushConsoleInputBuffer(OutputHandler.Handle);
 
             // Built-in event handling
-
-            if(InputHandler.GetKeyDown(KEY.F12) && !OutputHandler.LastFrameData.Equals(default(OutputHandler.RenderData)))
+            if(GameInput.GetKeyDown(KEY.F12) && FrameCount > 1)
             {
                 new Thread(() => TakeScreenshot(OutputHandler.LastFrameData.Surface)).Start();
             }

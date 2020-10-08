@@ -13,7 +13,7 @@ namespace Ax.Engine.Core
 
         internal override IEnumerator Routine()
         {
-            yield return new WaitWhile(() => InputHandler.GetKey(key));
+            yield return new WaitWhile(() => GameInput.GetKey(key));
         }
     }
 }

@@ -2,43 +2,49 @@
 using System.Text;
 using System.Collections.Generic;
 
-using Ax.Engine.Utils;
 using static Ax.Engine.Core.Native;
 
 namespace Ax.Engine.Core
 {
     public sealed class InputHandler
     {
-        public const short KEY_SCREENSHOT = (short)KEY.F2;
-
         public IntPtr Handle { get => handle; }
 
         private IntPtr handle;
         private CONSOLE_MODE_INPUT inLast;
 
-        private static readonly Dictionary<string, Axis> axises = new Dictionary<string, Axis>();
+        internal static readonly Dictionary<string, GameInput.Axis> axises = new Dictionary<string, GameInput.Axis>();
 
-        private static Dictionary<char, bool> lastKeyStates = new Dictionary<char, bool>();
-        private static Dictionary<char, bool> currentKeyStates = new Dictionary<char, bool>();
+        internal static Dictionary<char, bool> lastKeyStates = new Dictionary<char, bool>();
+        internal static Dictionary<char, bool> currentKeyStates = new Dictionary<char, bool>();
 
-        private static Func<char, bool>[] keyEventsCheck = new Func<char, bool>[] { GetKeyDown, GetKey, GetKeyUp };
-        private static Dictionary<char, EventHandler>[] keyEvents = new Dictionary<char, EventHandler>[3]
+        internal static Dictionary<uint, uint> lastMouseButtonStates = new Dictionary<uint, uint>();
+        internal static Dictionary<uint, uint> currentMouseButtonStates = new Dictionary<uint, uint>();
+
+        internal static Func<char, bool>[] keyEventsCheck = new Func<char, bool>[] { GameInput.GetKeyDown, GameInput.GetKey, GameInput.GetKeyUp };
+        internal static Dictionary<char, EventHandler>[] keyEvents = new Dictionary<char, EventHandler>[3]
         {
-            new Dictionary<char, EventHandler>(),
-            new Dictionary<char, EventHandler>(),
-            new Dictionary<char, EventHandler>()
+            new Dictionary<char, EventHandler>(),   // Key down
+            new Dictionary<char, EventHandler>(),   // Key press
+            new Dictionary<char, EventHandler>()    // Key up
         };
 
-        public enum KeyEventType : int
+        private static Func<uint, bool>[] mouseButtonEventsCheck = new Func<uint, bool>[] { };
+        private static Dictionary<uint, EventHandler>[] mouseButtonsEvents = new Dictionary<uint, EventHandler>[7]
         {
-            KeyDown = 0,
-            KeyPress = 1,
-            KeyUp = 2
-        }
+            new Dictionary<uint, EventHandler>(),   // Mouse down
+            new Dictionary<uint, EventHandler>(),   // Mouse press
+            new Dictionary<uint, EventHandler>(),   // Mouse up
+            new Dictionary<uint, EventHandler>(),   // Mouse double click
+            new Dictionary<uint, EventHandler>(),   // Mouse horizontal move
+            new Dictionary<uint, EventHandler>(),   // Mouse vertical move
+            new Dictionary<uint, EventHandler>()    // Mouse moved
+        };
 
         public bool Enable(ref StringBuilder logger)
         {
             bool stdIn;
+
             logger.AppendLine($"GETSTDIN       {stdIn = GetStdIn(out handle)}");
 
             if (!stdIn) { return false; }
@@ -84,7 +90,10 @@ namespace Ax.Engine.Core
         internal void UpdateInputStates(INPUT_RECORD[] rec)
         {
             lastKeyStates = new Dictionary<char, bool>(currentKeyStates);
+            lastMouseButtonStates = new Dictionary<uint, uint>(currentMouseButtonStates);
+
             currentKeyStates.Clear();
+            currentMouseButtonStates.Clear();
 
             for (int i = 0; i < rec.Length; i++)
             {
@@ -92,6 +101,10 @@ namespace Ax.Engine.Core
                 {
                     case (ushort)INPUT_RECORD_EVENT_TYPE.KEY_EVENT:
                         currentKeyStates[rec[i].KeyEvent.UnicodeChar] = rec[i].KeyEvent.bKeyDown;
+                        break;
+
+                    case (ushort)INPUT_RECORD_EVENT_TYPE.MOUSE_EVENT:
+                        currentMouseButtonStates[rec[i].MouseEvent.dwButtonState] = rec[i].MouseEvent.dwEventFlags;
                         break;
                 }
             }
@@ -105,6 +118,14 @@ namespace Ax.Engine.Core
                         keyEvent.Value.Invoke(null, null);
                     }
                 }
+            }
+
+            return;
+
+            Console.WriteLine("-----");
+            foreach (var item in currentMouseButtonStates)
+            {
+                Console.WriteLine($"{item.Key} -- {item.Value}");
             }
         }
 
@@ -127,130 +148,6 @@ namespace Ax.Engine.Core
 
             mode = (CONSOLE_MODE_INPUT)lpMode;
             return true;
-        }
-
-        public static void RegisterAxis(Axis axis, bool overrideIfExists = false)
-        {
-            if(overrideIfExists || !axises.ContainsKey(axis.name))
-            {
-                axises[axis.name] = axis;
-            }
-        }
-
-        #region Mouse Input
-        public static Vector2 GetMousePosition()
-        {
-            return Vector2.Zero;
-        }
-
-        public static bool GetMouseButtonDown(MOUSE_BUTTON_STATE button)
-        {
-            return false;
-        }
-
-        public static bool GetMouseButton(MOUSE_BUTTON_STATE button)
-        {
-            return false;
-        }
-
-        public static bool GetMouseButtonUp(MOUSE_BUTTON_STATE button)
-        {
-            return false;
-        }
-        #endregion
-
-        #region Keyboard Input
-        public static bool GetKeyDown(KEY key, bool caseSensitive = false)
-        {
-            char chKey = (char)key;
-            return caseSensitive ? GetKeyDown(chKey) : GetKeyDown(char.ToUpper(chKey)) || GetKeyDown(char.ToLower(chKey));
-        }
-
-        public static bool GetKeyDown(char chKey)
-        {
-            return (!lastKeyStates.ContainsKey(chKey) || !lastKeyStates[chKey]) && GetKey(chKey);
-        }
-
-        public static bool GetKey(KEY key)
-        {
-            char chKey = (char)key;
-            return GetKey(chKey);
-        }
-
-        public static bool GetKey(char chKey)
-        {
-            return currentKeyStates.ContainsKey(chKey) && currentKeyStates[chKey];
-        }
-
-        public static bool GetKeyUp(KEY key)
-        {
-            char chKey = (char)key;
-            return GetKeyUp(chKey);
-        }
-
-        public static bool GetKeyUp(char chKey)
-        {
-            return lastKeyStates.ContainsKey(chKey) && lastKeyStates[chKey] && !GetKey(chKey);
-        }
-        #endregion
-
-        #region Keyboard Input Events
-        public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, params KEY[] keys)
-        {
-            RegisterKeyEvent(keyEventType, callback, false, keys);;
-        }
-
-        public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, bool caseSensitive, params KEY[] keys)
-        {
-            List<char> chKeys = new List<char>();
-
-            for (int i = 0; i < keys.Length; i++)
-            {
-                char chKey = (char)keys[i];
-                if (caseSensitive)
-                {
-                    chKeys.Add(chKey);
-                }
-                else
-                {
-                    chKeys.Add(char.ToLower(chKey));
-                    chKeys.Add(char.ToUpper(chKey));
-                }
-            }
-
-            RegisterKeyEvent(keyEventType, callback, chKeys.ToArray());
-        }
-
-        public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, params char[] keys)
-        {
-            int registryIndex = (int)keyEventType;
-
-            for (int i = 0; i < keys.Length; i++)
-            {
-                if (!keyEvents[registryIndex].ContainsKey(keys[i]))
-                {
-                    keyEvents[registryIndex].Add(keys[i], null);
-                }
-
-                keyEvents[registryIndex][keys[i]] += (object sender, EventArgs e) => callback();
-            }
-        }
-        #endregion
-
-        public static int GetAxis(string axisName)
-        {
-            return 0;
-        }
-
-        public sealed class Axis
-        {
-            public string name;
-
-            public KEY positiveKey;
-            public KEY negativeKey;
-
-            public KEY alternativePositiveKey;
-            public KEY alternativeNegativeKey;
         }
     }
 }

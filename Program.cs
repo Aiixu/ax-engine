@@ -35,11 +35,25 @@ namespace Ax.Engine
             animatedCharacter.animationDelay = 0;
             animatedCharacter.Transform.position = new Vector2(5, 0);
             
+            /*IEnumerator TestMouseButtonCoroutine()
+            {
+                while(true)
+                {
+                    yield return new WaitForEndOfFrame();
+
+                    Console.WriteLine("a");
+                }
+            }
+
+            Yielder.StartCoroutine(TestMouseButtonCoroutine());
+            */
             while (game.IsRunning)
             {
                 game.HandleEvents();
                 game.Update();
                 //game.Render();
+
+                Console.WriteLine(GameInput.GetMouseWheelHorizontal());
 
                 //Console.WriteLine(InputHandler.GetKey(KEY.A));
 
