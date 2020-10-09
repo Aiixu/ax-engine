@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections;
 
 using Ax.Engine.Core;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
+
+using static Ax.Engine.Core.Native;
 
 namespace Ax.Engine
 {
@@ -53,9 +54,7 @@ namespace Ax.Engine
                 game.Update();
                 //game.Render();
 
-                Console.WriteLine(GameInput.GetMouseWheelHorizontal());
-
-                //Console.WriteLine(InputHandler.GetKey(KEY.A));
+                Console.WriteLine(GameInput.GetMouseButton(MOUSE_BUTTON.FROM_LEFT_1ST_BUTTON_PRESSED));
 
                 game.WaitFrame();
             }

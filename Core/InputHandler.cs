@@ -104,6 +104,7 @@ namespace Ax.Engine.Core
                         break;
 
                     case (ushort)INPUT_RECORD_EVENT_TYPE.MOUSE_EVENT:
+                        Console.WriteLine(rec[i].MouseEvent.dwButtonState + " " + rec[i].MouseEvent.dwEventFlags);
                         currentMouseButtonStates[rec[i].MouseEvent.dwButtonState] = rec[i].MouseEvent.dwEventFlags;
                         break;
                 }

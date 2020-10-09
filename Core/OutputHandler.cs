@@ -130,10 +130,8 @@ namespace Ax.Engine.Core
             {
                 lastFrameRendered = DateTime.Now;
             }
-            else
-            {
-                Thread.Sleep((int)(frameDelay - (DateTime.Now - lastFrameRendered).TotalMilliseconds));
-            }
+
+            Thread.Sleep((int)(frameDelay - (DateTime.Now - lastFrameRendered).TotalMilliseconds));
         }
 
         public bool Disable()

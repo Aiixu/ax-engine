@@ -24,7 +24,7 @@ namespace Ax.Engine
 
         public IntPtr HWND { get; private set; }
         public IntPtr HMENU { get; private set; }
-
+        
         public int FrameCount { get; private set; } = 0;
 
         public OutputHandler OutputHandler { get; private set; }
@@ -67,20 +67,23 @@ namespace Ax.Engine
             if (!IsRunning) { return; }
 
             // Capture events
-            uint eventCount = InputHandler.Read(out INPUT_RECORD[] recs);
+            InputHandler.Peek(out INPUT_RECORD[] recs);
+            FlushConsoleInputBuffer(InputHandler.Handle);
+
             InputHandler.UpdateInputStates(recs);
+            //InputHandler.Read(out _);
             //FlushConsoleInputBuffer(OutputHandler.Handle);
+            //InputHandler.Read()
 
             // Built-in event handling
-            if(GameInput.GetKeyDown(KEY.F12) && FrameCount > 1)
+            if (GameInput.GetKeyDown(KEY.F12) && FrameCount > 1)
             {
                 new Thread(() => TakeScreenshot(OutputHandler.LastFrameData.Surface)).Start();
             }
-
             /*
             if(eventCount == 0) { return; }
 
-            
+
             Console.Clear();
 
             Console.WriteLine(eventCount);
@@ -93,11 +96,11 @@ namespace Ax.Engine
             {
                 FieldInfo[] subFields = fields[i].FieldType.GetFields();
                 inputTable[0, y++] = $"== {fields[i].Name}";
-                
+
                 for (int j = 0; j < subFields.Length; j++)
                 {
                     if(i != 0) { inputTable[0, y++] = subFields[j].Name; }
-                    
+
                     for (int k = 0; k < eventCount; k++)
                     {
                         inputTable[k + 1, 0] = $"Event [{k + 1}]";

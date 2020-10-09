@@ -59,12 +59,12 @@ namespace Ax.Engine
 
         public static bool GetMouseButtonDown(MOUSE_BUTTON button)
         {
-            return false;
+            return currentMouseButtonStates.ContainsKey((uint)button);
         }
 
         public static bool GetMouseButton(MOUSE_BUTTON button)
         {
-            return false;
+            return currentMouseButtonStates.ContainsKey((uint)button);
         }
 
         public static bool GetMouseButtonUp(MOUSE_BUTTON button)
@@ -72,7 +72,7 @@ namespace Ax.Engine
             return false;
         }
 
-        public static int GetMouseWheelHorizontal()
+        public static int GetMouseWheelVertical()
         {
             return currentMouseButtonStates.ContainsValue((uint)MOUSE_EVENT_FLAGS.MOUSE_WHEELED) ?
                 currentMouseButtonStates.ContainsKey((uint)MOUSE_BUTTON.WHEEL_DOWN) ? -1 : 1 : 0;
