@@ -11,6 +11,10 @@ namespace Ax.Engine
 {
     public static class GameInput
     {
+        internal static Dictionary<char, Action> keyDownEvents = new Dictionary<char, Action>();
+        internal static Dictionary<char, Action> keyPressEvents = new Dictionary<char, Action>();
+        internal static Dictionary<char, Action> keyUpEvents = new Dictionary<char, Action>();
+
         public static bool GetKeyDown(KEY key, bool caseSensitive = false)
         {
             char chKey = (char)key;
@@ -59,25 +63,65 @@ namespace Ax.Engine
 
         public static bool GetMouseButtonDown(MOUSE_BUTTON button)
         {
-            return currentMouseButtonStates.ContainsKey((uint)button);
+            uint uButton = (uint)button;
+            //Console.WriteLine(currentMouseButtonStates.ContainsKey(uButton) ? currentMouseButtonStates[uButton].Count : 0);
+            return currentMouseButtonStates.ContainsKey(uButton) && 
+                currentMouseButtonStates[uButton].Count == 1 && 
+                (currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.CLICK_OR_RELEASE) || currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.DOUBLE_CLICK));
         }
 
         public static bool GetMouseButton(MOUSE_BUTTON button)
         {
-            return currentMouseButtonStates.ContainsKey((uint)button);
+            //return currentMouseButtonStates.ContainsKey((uint)button);
+            return false;
         }
 
         public static bool GetMouseButtonUp(MOUSE_BUTTON button)
         {
-            return false;
+            uint uButton = (uint)button;
+            return currentMouseButtonStates.ContainsKey(uButton) && 
+                currentMouseButtonStates[uButton].Count == 2 && 
+                currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.CLICK_OR_RELEASE) &&
+                currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.MOUSE_MOVED);
         }
 
         public static int GetMouseWheelVertical()
         {
-            return currentMouseButtonStates.ContainsValue((uint)MOUSE_EVENT_FLAGS.MOUSE_WHEELED) ?
-                currentMouseButtonStates.ContainsKey((uint)MOUSE_BUTTON.WHEEL_DOWN) ? -1 : 1 : 0;
+            return 0;
+            /*return currentMouseButtonStates.ContainsValue((uint)MOUSE_EVENT_FLAGS.MOUSE_WHEELED) ?
+                currentMouseButtonStates.ContainsKey((uint)MOUSE_BUTTON.WHEEL_DOWN) ? -1 : 1 : 0;*/
         }
-         
+
+        internal static void InvokeEvents()
+        {
+            // KeyDown
+            foreach (KeyValuePair<char, Action> eventData in keyDownEvents)
+            {
+                if(GetKeyDown(eventData.Key))
+                {
+                    eventData.Value.Invoke();
+                }
+            }
+
+            // KeyPress
+            foreach (KeyValuePair<char, Action> eventData in keyPressEvents)
+            {
+                if (GetKey(eventData.Key))
+                {
+                    eventData.Value.Invoke();
+                }
+            }
+
+            // KeyUp
+            foreach (KeyValuePair<char, Action> eventData in keyUpEvents)
+            {
+                if (GetKeyUp(eventData.Key))
+                {
+                    eventData.Value.Invoke();
+                }
+            }
+        }
+
         public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, params KEY[] keys)
         {
             RegisterKeyEvent(keyEventType, callback, false, keys); ;
@@ -106,16 +150,23 @@ namespace Ax.Engine
 
         public static void RegisterKeyEvent(KeyEventType keyEventType, Action callback, params char[] keys)
         {
-            int registryIndex = (int)keyEventType;
+            Dictionary<char, Action> eventRegistry = keyEventType switch
+            {
+                KeyEventType.KeyDown => keyDownEvents,
+                KeyEventType.KeyPress => keyPressEvents,
+                KeyEventType.KeyUp => keyUpEvents,
+
+                _ => throw new Exception("Unreachable")
+            };
 
             for (int i = 0; i < keys.Length; i++)
             {
-                if (!keyEvents[registryIndex].ContainsKey(keys[i]))
+                if (!eventRegistry.ContainsKey(keys[i]))
                 {
-                    keyEvents[registryIndex].Add(keys[i], null);
+                    eventRegistry.Add(keys[i], null);
                 }
 
-                keyEvents[registryIndex][keys[i]] += (object sender, EventArgs e) => callback();
+                eventRegistry[keys[i]] += callback;
             }
         }
 
@@ -126,9 +177,9 @@ namespace Ax.Engine
 
         public enum KeyEventType : int
         {
-            KeyDown = 0,
-            KeyPress = 1,
-            KeyUp = 2
+            KeyDown,
+            KeyPress,
+            KeyUp
         }
 
         public sealed class Axis

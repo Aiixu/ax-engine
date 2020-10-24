@@ -11,18 +11,20 @@ using Ax.Engine.Utils;
 using static Ax.Engine.Core.Native;
 using static Ax.Engine.Utils.DefaultValue;
 
+using Color = Ax.Engine.Utils.Color;
+
 namespace Ax.Engine.Core
 {
     public sealed class OutputHandler
     {
-        public enum RenderingMode
+        public enum RenderingMode : byte
         {
-            VTColorOnlyBackground,
-            VTColorOnlyForeground,
+            VTColorOnlyForeground = 51,
+            VTColorOnlyBackground = 52,
             VTColorOnlyBothBackgroundAndForeground,
 
             VTColorOnlyHalfChar,
-            
+
             VTColorAndChars,
             VTColorOnlyAndChars,
 
@@ -105,7 +107,7 @@ namespace Ax.Engine.Core
             newFont.dwFontSize.Y = (short)fontHeight;
 
             logger.AppendLine($"SETFONT        {SetCurrentConsoleFontEx(GetStdHandle((uint)HANDLE.STD_OUTPUT_HANDLE), false, ref newFont)}");
-            
+
             calculationStopwatch = new Stopwatch();
             releaseStopwatch = new Stopwatch();
             writeStopwatch = new Stopwatch();
@@ -142,12 +144,13 @@ namespace Ax.Engine.Core
 
             disabled &= GetStdOut(out _);
             disabled &= SetConsoleMode(Handle, (uint)outLast);
-            
+
             SetCurrentConsoleFontEx(GetStdHandle((uint)HANDLE.STD_OUTPUT_HANDLE), false, ref lastFont);
 
             return disabled;
         }
 
+        private byte[] surfaceBuffer;
         public void PrepareSurface(int width, int height)
         {
             // canPrepareSurface = false;
@@ -159,7 +162,9 @@ namespace Ax.Engine.Core
 
             globalStopwatch.Start();
 
-            switch(renderingMode)
+            //surfaceBuffer = new byte[width * height * 20];
+
+            switch (renderingMode)
             {
                 case RenderingMode.VTColorOnlyBackground:
                 case RenderingMode.VTColorOnlyForeground:
@@ -181,6 +186,8 @@ namespace Ax.Engine.Core
         {
             bool ProcessRenderInternal()
             {
+                if (x < 0 || x >= surfaceSet.GetLength(0) || y < 0 || y >= surfaceSet.GetLength(1)) { return false; }
+
                 // z == int.MaxValue > dev tools
                 if (forced || !surfaceSet[x, y] || (surfaceSet[x, y] && surface[x, y].z >= z && surface[x, y].z != int.MaxValue))
                 {
@@ -189,7 +196,7 @@ namespace Ax.Engine.Core
                         z = z
                     };
 
-                    switch(renderingMode)
+                    switch (renderingMode)
                     {
                         case RenderingMode.VTColorOnlyBackground:
                         case RenderingMode.VTColorOnlyForeground:
@@ -234,11 +241,15 @@ namespace Ax.Engine.Core
 
             return results;
         }
-     
+
         public int ReleaseSurface()
         {
             releaseStopwatch.Start();
             StringBuilder bytesBuilder = new StringBuilder();
+
+            Color background = new Color(0, 0, 0);
+
+            byte[] byteBuffer = new byte[surface.GetLength(0) * surface.GetLength(1) * 20];
 
             switch (renderingMode)
             {
@@ -246,6 +257,11 @@ namespace Ax.Engine.Core
                 case RenderingMode.VTColorOnlyForeground:
                 case RenderingMode.VTColorOnlyBothBackgroundAndForeground:
                     {
+                        byte[] baseColorSequence = new byte[]
+                        {
+                            27, 91, 0, 56, 59, 50, 59, 0, 0, 0, 59, 0, 0, 0, 59, 0, 0, 0, 109, 32 // last byte is character
+                        };
+
                         SurfaceItem[] flattenSurface = surface.To1DArray();
                         List<GroupedSurfaceItem> groupedSurface = new List<GroupedSurfaceItem>();
 
@@ -264,7 +280,27 @@ namespace Ax.Engine.Core
                             {
                                 // VTColorOnlyBackground
                                 // VTColorOnlyForeground
+                                
+                                baseColorSequence[2] = (byte)renderingMode;
 
+                                // red
+                                baseColorSequence[7] = (byte)(surfaceColor.r / 100 % 10 + 48);
+                                baseColorSequence[8] = (byte)(surfaceColor.r / 010 % 10 + 48);
+                                baseColorSequence[9] = (byte)(surfaceColor.r / 001 % 10 + 48);
+
+                                // green
+                                baseColorSequence[11] = (byte)(surfaceColor.g / 100 % 10 + 48);
+                                baseColorSequence[12] = (byte)(surfaceColor.g / 010 % 10 + 48);
+                                baseColorSequence[13] = (byte)(surfaceColor.g / 001 % 10 + 48);
+
+                                // blue              
+                                baseColorSequence[15] = (byte)(surfaceColor.b / 100 % 10 + 48);
+                                baseColorSequence[16] = (byte)(surfaceColor.b / 010 % 10 + 48);
+                                baseColorSequence[17] = (byte)(surfaceColor.b / 001 % 10 + 48);
+
+                                baseColorSequence[19] = 32;
+
+                                continue;
                                 bytesBuilder.Append(renderingMode == RenderingMode.VTColorOnlyBackground ? GetColorBackgroundString(surfaceColor) : GetColorForegroundString(surfaceColor));
                                 bytesBuilder.Append(new string(renderingMode == RenderingMode.VTColorOnlyBackground ? ' ' : '█', count));
                             }
@@ -278,80 +314,7 @@ namespace Ax.Engine.Core
 
                         if (renderingMode != RenderingMode.VTColorOnlyBothBackgroundAndForeground) { break; }
 
-                        // todo > move to single loop
-
-                        // VTColorOnlyBothBackgroundAndForeground
-
-                        Color lastBackground = null;
-                        Color lastForeground = null;
-
-                        const bool LAST_USED_IS_FOREGROUND = true;
-                        const bool LAST_USED_IS_BACKGROUND = false;
-
-                        bool lastUsed = false;
-
-                        for (int i = 0; i < groupedSurface.Count; i++)
-                        {
-                            Color color = groupedSurface[i].color;
-
-                            // 1rst  pass
-                            if (lastBackground == null)
-                            {
-                                bytesBuilder.Append(GetColorBackgroundString(groupedSurface[i].color));
-                                bytesBuilder.Append(new string(' ', groupedSurface[i].charCount));
-
-                                lastBackground = groupedSurface[i].color;
-                                lastUsed = LAST_USED_IS_BACKGROUND;
-
-                                continue;
-                            }
-
-                            if(lastForeground == null)
-                            {
-                                bytesBuilder.Append(GetColorForegroundString(groupedSurface[i].color));
-                                bytesBuilder.Append(new string('█', groupedSurface[i].charCount));
-
-                                lastForeground = groupedSurface[i].color;
-                                lastUsed = LAST_USED_IS_FOREGROUND;
-
-                                continue;
-                            }
-
-
-                            // Nth pass
-                            if(lastBackground.Equals(color))
-                            {
-                                bytesBuilder.Append(new string(' ', groupedSurface[i].charCount));
-                            }
-                            else if (lastForeground.Equals(color))
-                            {
-                                bytesBuilder.Append(new string('█', groupedSurface[i].charCount));
-                            }
-                            else
-                            {
-                                lastBackground = null;
-                                lastForeground = null;
-                            }
-
-                            
-
-                            continue;
-
-                            if (i >= groupedSurface.Count - 2) { continue; }
-
-
-                            if (color.Equals(groupedSurface[i + 2].color))
-                            {
-
-                            }
-
-                            /*if (i != groupedSurface.Count - 1)
-                            {
-                                bytesBuilder.Append(GetColorForegroundString(groupedSurface[i + 1].color));
-                                bytesBuilder.Append(new string('█', groupedSurface[i + 1].charCount));
-                                i++;
-                            }*/
-                        }
+                        // implement VTColorOnlyBothBackgroundAndForeground
                     }
                     break;
 
@@ -359,19 +322,38 @@ namespace Ax.Engine.Core
                     {
                         bool lastPixelIsBackground = true;
 
-                        for (int y = 0; y < surfaceSet.GetLength(1); y++)
+                        int height = surfaceSet.GetLength(1);
+                        int width = surfaceSet.GetLength(0);
+
+                        Dictionary<Color, string> storedValues = new Dictionary<Color, string>()
                         {
-                            for (int x = 0; x < surfaceSet.GetLength(0); x++)
+                            { background, GetColorBackgroundString(background) }
+                        };
+
+                        for (int y = 0; y < height; y++)
+                        {
+                            for (int x = 0; x < width; x++)
                             {
                                 SurfaceItem surfaceItem = surface[x, y];
 
                                 if (surfaceSet[x, y])
                                 {
-                                    string bg = GetColorBackgroundString(surfaceItem.bg.r, surfaceItem.bg.g, surfaceItem.bg.b);
-                                    string fg = GetColorForegroundString(surfaceItem.fg.r, surfaceItem.fg.g, surfaceItem.fg.b);
+                                    if (surfaceItem.ch != '\0')
+                                    {
+                                        if (!storedValues.ContainsKey(surfaceItem.fg))
+                                        {
+                                            storedValues.Add(surfaceItem.fg, GetColorForegroundString(surfaceItem.fg.r, surfaceItem.fg.g, surfaceItem.fg.b));
+                                        }
 
-                                    bytesBuilder.Append(bg);
-                                    bytesBuilder.Append(fg);
+                                        bytesBuilder.Append(storedValues[surfaceItem.fg]);
+                                    }
+
+                                    if (!storedValues.ContainsKey(surfaceItem.bg))
+                                    {
+                                        storedValues.Add(surfaceItem.bg, GetColorBackgroundString(surfaceItem.bg.r, surfaceItem.bg.g, surfaceItem.bg.b));
+                                    }
+
+                                    bytesBuilder.Append(storedValues[surfaceItem.bg]);
                                     bytesBuilder.Append(surfaceItem.ch == '\0' ? ' ' : surfaceItem.ch);
 
                                     lastPixelIsBackground = false;
@@ -380,8 +362,7 @@ namespace Ax.Engine.Core
                                 {
                                     if (!lastPixelIsBackground)
                                     {
-                                        string bg = GetColorBackgroundString(0, 0, 0);
-                                        bytesBuilder.Append(bg);
+                                        bytesBuilder.Append(storedValues[background]);
 
                                         lastPixelIsBackground = true;
                                     }
@@ -393,13 +374,21 @@ namespace Ax.Engine.Core
                     }
                     break;
 
+                case RenderingMode.VTColorOnlyHalfChar:
+                    {
+
+                    }
+                    break;
             }
             releaseStopwatch.Stop();
-            
+
+            // WRIT
             writeStopwatch.Start();
+
             Console.SetCursorPosition(0, 0);
             byte[] buffer = consoleEncoding.GetBytes(bytesBuilder.ToString());
             WriteConsole(Handle, buffer, buffer.Length, out int written, IntPtr.Zero);
+
             writeStopwatch.Stop();
 
             globalStopwatch.Stop();
@@ -413,15 +402,15 @@ namespace Ax.Engine.Core
                 Surface = surface
             };
 
-            Logger.Write(renderingMode);
+            /*Logger.Write(renderingMode);
             Logger.Write($"CALC {calculationStopwatch.Elapsed}");
             Logger.Write($"RELE {releaseStopwatch.Elapsed}");
             Logger.Write($"WRIT {writeStopwatch.Elapsed}");
-            Logger.Write($"GLOB {globalStopwatch.Elapsed}");
+            Logger.Write($"GLOB {globalStopwatch.Elapsed}");*/
             //Environment.Exit(0);
             // canPrepareSurface = true;
 
-            return 0; //written
+            return written; //written
         }
 
         private bool GetStdOut(out IntPtr handle)
@@ -480,15 +469,19 @@ namespace Ax.Engine.Core
                 this.charCount = charCount;
             }
         }
-        
+
         public struct RenderData
         {
-            public TimeSpan CalculationTime { get; internal set; } 
+            public TimeSpan CalculationTime { get; internal set; }
             public TimeSpan ReleaseTime { get; internal set; }
             public TimeSpan WriteTime { get; internal set; }
             public TimeSpan GlobalTime { get; internal set; }
             public SurfaceItem[,] Surface { get; internal set; }
+
+            public override string ToString()
+            {
+                return $"CALC {CalculationTime}, RELE {ReleaseTime}, WRIT {WriteTime}, GLOB {GlobalTime}";
+            }
         }
     }
 }
-                

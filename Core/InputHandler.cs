@@ -18,28 +18,10 @@ namespace Ax.Engine.Core
         internal static Dictionary<char, bool> lastKeyStates = new Dictionary<char, bool>();
         internal static Dictionary<char, bool> currentKeyStates = new Dictionary<char, bool>();
 
-        internal static Dictionary<uint, uint> lastMouseButtonStates = new Dictionary<uint, uint>();
-        internal static Dictionary<uint, uint> currentMouseButtonStates = new Dictionary<uint, uint>();
+        internal static Dictionary<uint, List<uint>> lastRecordedMouseButtonStates = new Dictionary<uint, List<uint>>();
 
-        internal static Func<char, bool>[] keyEventsCheck = new Func<char, bool>[] { GameInput.GetKeyDown, GameInput.GetKey, GameInput.GetKeyUp };
-        internal static Dictionary<char, EventHandler>[] keyEvents = new Dictionary<char, EventHandler>[3]
-        {
-            new Dictionary<char, EventHandler>(),   // Key down
-            new Dictionary<char, EventHandler>(),   // Key press
-            new Dictionary<char, EventHandler>()    // Key up
-        };
-
-        private static Func<uint, bool>[] mouseButtonEventsCheck = new Func<uint, bool>[] { };
-        private static Dictionary<uint, EventHandler>[] mouseButtonsEvents = new Dictionary<uint, EventHandler>[7]
-        {
-            new Dictionary<uint, EventHandler>(),   // Mouse down
-            new Dictionary<uint, EventHandler>(),   // Mouse press
-            new Dictionary<uint, EventHandler>(),   // Mouse up
-            new Dictionary<uint, EventHandler>(),   // Mouse double click
-            new Dictionary<uint, EventHandler>(),   // Mouse horizontal move
-            new Dictionary<uint, EventHandler>(),   // Mouse vertical move
-            new Dictionary<uint, EventHandler>()    // Mouse moved
-        };
+        //internal static Dictionary<uint, uint> lastMouseButtonStates = new Dictionary<uint, uint>();
+        internal static Dictionary<uint, List<uint>> currentMouseButtonStates = new Dictionary<uint, List<uint>>();
 
         public bool Enable(ref StringBuilder logger)
         {
@@ -90,7 +72,7 @@ namespace Ax.Engine.Core
         internal void UpdateInputStates(INPUT_RECORD[] rec)
         {
             lastKeyStates = new Dictionary<char, bool>(currentKeyStates);
-            lastMouseButtonStates = new Dictionary<uint, uint>(currentMouseButtonStates);
+            //lastMouseButtonStates = new Dictionary<uint, List<uint>>(currentMouseButtonStates);
 
             currentKeyStates.Clear();
             currentMouseButtonStates.Clear();
@@ -104,30 +86,17 @@ namespace Ax.Engine.Core
                         break;
 
                     case (ushort)INPUT_RECORD_EVENT_TYPE.MOUSE_EVENT:
-                        Console.WriteLine(rec[i].MouseEvent.dwButtonState + " " + rec[i].MouseEvent.dwEventFlags);
-                        currentMouseButtonStates[rec[i].MouseEvent.dwButtonState] = rec[i].MouseEvent.dwEventFlags;
+                        if(!currentMouseButtonStates.ContainsKey(rec[i].MouseEvent.dwButtonState))
+                        {
+                            currentMouseButtonStates[rec[i].MouseEvent.dwButtonState] = new List<uint>();
+                        }
+
+                        currentMouseButtonStates[rec[i].MouseEvent.dwButtonState].Add(rec[i].MouseEvent.dwEventFlags);
                         break;
                 }
             }
 
-            for (int i = 0; i < keyEvents.Length; i++)
-            {
-                foreach (KeyValuePair<char, EventHandler> keyEvent in keyEvents[i])
-                {
-                    if (keyEventsCheck[i].Invoke(keyEvent.Key))
-                    {
-                        keyEvent.Value.Invoke(null, null);
-                    }
-                }
-            }
-
             return;
-
-            Console.WriteLine("-----");
-            foreach (var item in currentMouseButtonStates)
-            {
-                Console.WriteLine($"{item.Key} -- {item.Value}");
-            }
         }
 
         private bool GetStdIn(out IntPtr handle)

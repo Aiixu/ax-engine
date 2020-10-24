@@ -5,9 +5,9 @@ namespace Ax.Engine.Utils
 {
     public class Color : IEquatable<Color>
     {
-        public byte r;
-        public byte g;
-        public byte b;
+        public readonly byte r;
+        public readonly byte g;
+        public readonly byte b;
 
         public Color(byte r, byte g, byte b)
         {
@@ -26,18 +26,6 @@ namespace Ax.Engine.Utils
 
                 _ => throw new IndexOutOfRangeException("Invalid Vector3 index!")
             };
-
-            set
-            {
-                switch (index)
-                {
-                    case 0: r = value; break;
-                    case 1: g = value; break;
-                    case 2: b = value; break;
-
-                    default: throw new IndexOutOfRangeException("Invalid Vector3 index!");
-                }
-            }
         }
 
         public override string ToString()
@@ -70,7 +58,7 @@ namespace Ax.Engine.Utils
 
         public bool Equals(Color other)
         {
-            return other != null && r == other.r && g == other.g && b == other.b;
+            return r == other.r && g == other.g && b == other.b;
         }
     }
 }

@@ -75,6 +75,8 @@ namespace Ax.Engine
             //FlushConsoleInputBuffer(OutputHandler.Handle);
             //InputHandler.Read()
 
+            GameInput.InvokeEvents();
+
             // Built-in event handling
             if (GameInput.GetKeyDown(KEY.F12) && FrameCount > 1)
             {
