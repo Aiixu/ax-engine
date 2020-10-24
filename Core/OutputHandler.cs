@@ -249,6 +249,7 @@ namespace Ax.Engine.Core
 
             Color background = new Color(0, 0, 0);
 
+            int byteOffset = 0;
             byte[] byteBuffer = new byte[surface.GetLength(0) * surface.GetLength(1) * 20];
 
             switch (renderingMode)
@@ -299,6 +300,9 @@ namespace Ax.Engine.Core
                                 baseColorSequence[17] = (byte)(surfaceColor.b / 001 % 10 + 48);
 
                                 baseColorSequence[19] = 32;
+
+                                Buffer.BlockCopy(baseColorSequence, 0, byteBuffer, byteOffset, 20);
+                                byteOffset += 20;
 
                                 continue;
                                 bytesBuilder.Append(renderingMode == RenderingMode.VTColorOnlyBackground ? GetColorBackgroundString(surfaceColor) : GetColorForegroundString(surfaceColor));
@@ -386,8 +390,8 @@ namespace Ax.Engine.Core
             writeStopwatch.Start();
 
             Console.SetCursorPosition(0, 0);
-            byte[] buffer = consoleEncoding.GetBytes(bytesBuilder.ToString());
-            WriteConsole(Handle, buffer, buffer.Length, out int written, IntPtr.Zero);
+            //byte[] buffer = consoleEncoding.GetBytes(bytesBuilder.ToString());
+            WriteConsole(Handle, byteBuffer, byteOffset, out int written, IntPtr.Zero);
 
             writeStopwatch.Stop();
 
