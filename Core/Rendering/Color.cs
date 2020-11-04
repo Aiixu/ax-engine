@@ -1,6 +1,6 @@
 ﻿namespace Ax.Engine.Core.Rendering
 {
-    public struct Color
+    public struct Color : ISurfaceItem
     {
         public int Argb { get; private set; }
 

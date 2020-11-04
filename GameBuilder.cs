@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 
@@ -28,10 +29,26 @@ namespace Ax.Engine
         public bool CursorVisible = false;
 
         public OutputHandler.RenderingMode RenderingMode;
+        public int RenderingThreadCount;
 
         public GameBuilder SetRenderingMode(OutputHandler.RenderingMode renderingMode)
         {
             RenderingMode = renderingMode;
+
+            return this;
+        }
+
+        public GameBuilder SetRenderingThreadCount(int renderingThreadCount)
+        {
+            if(!RenderingMode.HasFlag(OutputHandler.RenderingMode.MultiThreaded))
+            {
+                throw new Exception("Please make sure to enable multi threaded rendering in order to set rendering thread count");
+            }
+
+            if(renderingThreadCount == 0 || renderingThreadCount % 2 != 0)
+            {
+                throw new Exception("Rendering thread count should be greater than 1 (since 1 = 1 thread) and a power of two");
+            }
 
             return this;
         }

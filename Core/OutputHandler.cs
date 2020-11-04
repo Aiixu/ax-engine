@@ -12,13 +12,20 @@ using static Ax.Engine.Core.Native;
 using static Ax.Engine.Utils.DefaultValue;
 
 using Color = Ax.Engine.Utils.Color;
+using System.Reflection.Emit;
+using System.Reflection;
 
 namespace Ax.Engine.Core
 {
     public sealed class OutputHandler
     {
+        private delegate void MemorySetter(IntPtr array, byte value, int count);
+        private MemorySetter MemsetDelegate;
+
         public enum RenderingMode : byte
         {
+            MultiThreaded = 0,
+
             VTColorOnlyForeground = 51,
             VTColorOnlyBackground = 52,
             VTColorOnlyBothBackgroundAndForeground,
@@ -122,6 +129,17 @@ namespace Ax.Engine.Core
 
             bool cMode;
             logger.AppendLine($"SETCMODEOUT    {cMode = SetConsoleMode(Handle, (uint)mode)}");
+
+            DynamicMethod m = new DynamicMethod("memset", MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, typeof(void), new[] { typeof(IntPtr), typeof(byte), typeof(int) }, typeof(OutputHandler), false);
+            
+            ILGenerator il = m.GetILGenerator();
+            il.Emit(OpCodes.Ldarg_0); // address
+            il.Emit(OpCodes.Ldarg_1); // initialization value
+            il.Emit(OpCodes.Ldarg_2); // number of bytes
+            il.Emit(OpCodes.Initblk);
+            il.Emit(OpCodes.Ret);
+
+            MemsetDelegate = (MemorySetter)m.CreateDelegate(typeof(MemorySetter));
 
             return cMode;
         }
@@ -260,7 +278,7 @@ namespace Ax.Engine.Core
                     {
                         byte[] baseColorSequence = new byte[]
                         {
-                            27, 91, 0, 56, 59, 50, 59, 0, 0, 0, 59, 0, 0, 0, 59, 0, 0, 0, 109, 32 // last byte is character
+                            27, 91, 0, 56, 59, 50, 59, 0, 0, 0, 59, 0, 0, 0, 59, 0, 0, 0, 109
                         };
 
                         SurfaceItem[] flattenSurface = surface.To1DArray();
@@ -299,10 +317,13 @@ namespace Ax.Engine.Core
                                 baseColorSequence[16] = (byte)(surfaceColor.b / 010 % 10 + 48);
                                 baseColorSequence[17] = (byte)(surfaceColor.b / 001 % 10 + 48);
 
-                                baseColorSequence[19] = 32;
+                                byte[] charBytes = new byte[count];
+                                Memset(charBytes, 0, count, 32);
 
-                                Buffer.BlockCopy(baseColorSequence, 0, byteBuffer, byteOffset, 20);
-                                byteOffset += 20;
+                                Buffer.BlockCopy(baseColorSequence, 0, byteBuffer, byteOffset, 19);
+                                Buffer.BlockCopy(charBytes, 0, byteBuffer, byteOffset + 19, count);
+
+                                byteOffset += 19 + count;
 
                                 continue;
                                 bytesBuilder.Append(renderingMode == RenderingMode.VTColorOnlyBackground ? GetColorBackgroundString(surfaceColor) : GetColorForegroundString(surfaceColor));
@@ -485,6 +506,22 @@ namespace Ax.Engine.Core
             public override string ToString()
             {
                 return $"CALC {CalculationTime}, RELE {ReleaseTime}, WRIT {WriteTime}, GLOB {GlobalTime}";
+            }
+        }
+
+        private void Memset(byte[] array, int start, int count, byte value)
+        {
+            GCHandle h = default;
+            try
+            {
+                h = GCHandle.Alloc(array, GCHandleType.Pinned);
+                IntPtr addr = h.AddrOfPinnedObject() + start;
+                MemsetDelegate(addr, value, count);
+            }
+            finally
+            {
+                if (h.IsAllocated)
+                    h.Free();
             }
         }
     }

@@ -131,6 +131,7 @@
     <Compile Include="Core\NativeStructs\SMALL_RECT.cs" />
     <Compile Include="Core\NativeStructs\WINDOW_BUFFER_SIZE_RECORD .cs" />
     <Compile Include="Core\Rendering\Color.cs" />
+    <Compile Include="Core\Rendering\ISurfaceItem.cs" />
     <Compile Include="Core\Yielder.cs" />
     <Compile Include="Core\YieldInstructions\WaitForEndOfFrame.cs" />
     <Compile Include="Core\YieldInstructions\WaitForFrameCount.cs" />
@@ -156,6 +157,8 @@
     <Compile Include="Game.cs" />
     <Compile Include="GameBuilder.cs" />
     <Compile Include="GameInput.cs" />
+    <Compile Include="Core\Rendering\Queued\QueuedSurfaceRenderer.cs" />
+    <Compile Include="Core\Rendering\SurfaceRenderer.cs" />
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Utils\DefaultValue.cs" />
     <Compile Include="Utils\MathHelper.cs" />

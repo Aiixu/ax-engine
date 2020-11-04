@@ -1,10 +1,11 @@
 ﻿using System;
 
 using Ax.Engine.Core;
+using Ax.Engine.Core.Rendering;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
-using System.Diagnostics;
+using System.Threading;
 
 namespace Ax.Engine
 {
@@ -23,7 +24,22 @@ namespace Ax.Engine
                 .LimitFPS(15)
                 .SetRenderingMode(OutputHandler.RenderingMode.VTColorOnlyBackground)
                 .Build();
+            
+            SurfaceRenderer renderer = new QueuedSurfaceRenderer(game.OutputHandler.Handle, 80, 50);
 
+            int n = 10000000;
+            for (int i = 0; i < n; i++)
+            {
+                renderer.ReleaseSurface();
+            }
+            // 27002143
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
+            Console.WriteLine(((QueuedSurfaceRenderer)renderer).total);
+
+            Console.Read();
+            return;
+            
             /*
             Stopwatch a = new Stopwatch();
             a.Start();
