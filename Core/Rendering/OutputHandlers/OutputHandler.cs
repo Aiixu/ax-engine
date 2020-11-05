@@ -16,11 +16,6 @@ namespace Ax.Engine.Core.Rendering
 
         private DateTime lastFrameRendered;
 
-        private Stopwatch clcStopwatch;
-        private Stopwatch relStopwatch;
-        private Stopwatch wrtStopwatch;
-        private Stopwatch glbStopwatch;
-
         public OutputHandler(OutputHandlerInfo info = default)
         {
             Info = info;

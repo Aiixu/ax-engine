@@ -12,11 +12,10 @@ namespace Ax.Engine
     {
         private static Game game;
 
-        public static void Main(string[] __)
+        public static void Main(string[] _)
         {
             Console.WriteLine(string.Join(", ", Console.OutputEncoding.GetBytes("\x1b[2J")));
 
-            /*
             game = new GameBuilder()
                 .SetTitle("Engine demo")
                 .SetFont("Lucidas Console", 10, 10)
@@ -26,7 +25,6 @@ namespace Ax.Engine
                 .LimitFPS(15)
                 .SetRenderer(typeof(SurfaceRenderer<RgbSurfaceItem>))
                 .Build();
-            */
 
 
             /*
@@ -64,7 +62,8 @@ namespace Ax.Engine
 
             EntityManager.EnableRegistry(false);
 
-            CameraComponent camera = EntityManager.AddEntity().AddComponent<CameraComponent>();
+            // Create camera
+            EntityManager.AddEntity().AddComponent<CameraComponent>();
 
             AnimatedSpriteComponent animatedCharacter = EntityManager.AddEntity().AddComponent<AnimatedSpriteComponent>();
             animatedCharacter.ImportSheet("assets/landscape", new Vector2Int(80, 50));
@@ -83,10 +82,10 @@ namespace Ax.Engine
 
             Yielder.StartCoroutine(TestMouseButtonCoroutine());
             */
-
+            /*
             int iterations = 0;
             int iterationCount = 10;
-
+            */
             while (game.IsRunning)
             {
                 game.HandleEvents();

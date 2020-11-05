@@ -12,6 +12,8 @@ namespace Ax.Engine.Core.Rendering
         
         public override void ReleaseSurface()
         {
+            BeginRelRecord();
+
             byte[] buffer = new byte[screenWidth * screenHeight * 20];
             int positionInBuffer = 0;
 
@@ -49,16 +51,28 @@ namespace Ax.Engine.Core.Rendering
                 positionInBuffer += 19 + count;
             }
 
+            EndRelRecord();
+
+            BeginWrtRecord();
+
             Console.SetCursorPosition(0, 0);
-            //WriteConsole(outHandle, buffer, positionInBuffer, out _, IntPtr.Zero);
             outputHandler.Write(buffer, positionInBuffer);
             outputHandler.EndWrite();
+
+            EndWrtRecord();
+
+            EndGlbRecord();
+            ExportRecord();
         }
 
         public override bool Render(ISurfaceItem c, int x, int y)
         {
+            BeginClcRecord();
+
             surface[x, y] = c;
             surfaceSet[x, y] = true;
+
+            EndClcRecord();
 
             return true;
         }
