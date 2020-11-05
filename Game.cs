@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System.IO;
+using System.Threading;
 
 using Ax.Engine.Core;
-using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
+using Ax.Engine.Core.Rendering;
 
-using static Ax.Engine.Core.Native;
-
-using Color = Ax.Engine.Utils.Color;
-using System.Threading;
-using System.IO;
+using static Ax.Engine.Core.Native.WinApi;
+using static Ax.Engine.Core.Native.WinUser;
 
 namespace Ax.Engine
 {
@@ -22,24 +19,13 @@ namespace Ax.Engine
         public bool IsRunning { get; private set; } = false;
         public bool OpenDevMenu { get; set; } = false;
 
-        public IntPtr HWND { get; private set; }
-        public IntPtr HMENU { get; private set; }
-        
         public int FrameCount { get; private set; } = 0;
 
-        public OutputHandler OutputHandler { get; private set; }
-        public InputHandler InputHandler { get; private set; }
+        //public OutputHandler OutputHandler { get; private set; }
+        public InputHandler Input { get; private set; }
+        public SurfaceRenderer Renderer { get; private set; }
 
-        public static int WindowWidthInPixels { get; internal set; }
-        public static int WindowHeightInPixels { get; internal set; }
-
-        public static int WindowWidth { get; internal set; }
-        public static int WindowHeight { get; internal set; }
-
-        public static int FontWidth { get; internal set; }
-        public static int FontHeight { get; internal set; }
-
-        public Game(IntPtr hWnd, IntPtr hMenu, OutputHandler outputHandler, InputHandler inputHandler, bool isRunning) 
+        public Game(SurfaceRenderer renderer, InputHandler inputHandler, bool isRunning) 
         {
             if (Instance != null)
             {
@@ -47,11 +33,8 @@ namespace Ax.Engine
                 return;
             }
 
-            HWND = hWnd;
-            HMENU = hMenu;
-
-            OutputHandler = outputHandler;
-            InputHandler = inputHandler;
+            Renderer = renderer;
+            Input = inputHandler;
 
             IsRunning = isRunning;
 
@@ -67,10 +50,10 @@ namespace Ax.Engine
             if (!IsRunning) { return; }
 
             // Capture events
-            InputHandler.Peek(out INPUT_RECORD[] recs);
-            FlushConsoleInputBuffer(InputHandler.Handle);
+            Input.Peek(out INPUT_RECORD[] recs);
+            FlushConsoleInputBuffer(Input.Handle);
 
-            InputHandler.UpdateInputStates(recs);
+            Input.UpdateInputStates(recs);
             //InputHandler.Read(out _);
             //FlushConsoleInputBuffer(OutputHandler.Handle);
             //InputHandler.Read()
@@ -80,7 +63,7 @@ namespace Ax.Engine
             // Built-in event handling
             if (GameInput.GetKeyDown(KEY.F12) && FrameCount > 1)
             {
-                new Thread(() => TakeScreenshot(OutputHandler.LastFrameData.Surface)).Start();
+                new Thread(TakeScreenshot).Start();
             }
             /*
             if(eventCount == 0) { return; }
@@ -117,10 +100,10 @@ namespace Ax.Engine
             return;
         }
 
-        public void TakeScreenshot(OutputHandler.SurfaceItem[,] surface)
+        public void TakeScreenshot()
         {
             if (!Directory.Exists("screenshots")) { Directory.CreateDirectory("screenshots"); }
-
+            /*
             Bitmap bmp = new Bitmap(WindowWidthInPixels, WindowHeightInPixels);
 
             for (int y = 0; y < WindowHeight; y++)
@@ -138,7 +121,7 @@ namespace Ax.Engine
             }
             
             string outPath = Path.Combine("screenshots", string.Concat(DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-ff"), ".png"));
-            bmp.Save(outPath, ImageFormat.Png);
+            bmp.Save(outPath, ImageFormat.Png);*/
         }
 
         public void Update()
@@ -154,10 +137,10 @@ namespace Ax.Engine
         {
             if (!IsRunning) { return; }
 
-            OutputHandler.PrepareSurface(Console.BufferWidth, Console.BufferHeight);
+            Renderer.PrepareSurface();
 
             if (OpenDevMenu)
-            {
+            {/*
                 OutputHandler.RenderData lastFrame = OutputHandler.LastFrameData;
 
                 string glob = lastFrame.GlobalTime.ToString();
@@ -175,31 +158,36 @@ namespace Ax.Engine
                 OutputHandler.RenderStr(6, 1, int.MaxValue, glob, Color.White, Color.Black, true);
                 OutputHandler.RenderStr(6, 2, int.MaxValue, calc, Color.White, Color.Black, true);
                 OutputHandler.RenderStr(6, 3, int.MaxValue, rele, Color.White, Color.Black, true);
-                OutputHandler.RenderStr(6, 4, int.MaxValue, writ, Color.White, Color.Black, true);
+                OutputHandler.RenderStr(6, 4, int.MaxValue, writ, Color.White, Color.Black, true);*/
             }
 
             if (!EntityManager.EntityExistsWithComponent<CameraComponent>())
             {
-                OutputHandler.RenderStr(Console.WindowWidth / 2 - 9, MathHelper.FloorToInt(Console.WindowHeight / 2f) - 1, int.MaxValue, "NO CAMERA RENDERING", Color.White, Color.Black, true);
+                //OutputHandler.RenderStr(Console.WindowWidth / 2 - 9, MathHelper.FloorToInt(Console.WindowHeight / 2f) - 1, int.MaxValue, "NO CAMERA RENDERING", Color.White, Color.Black, true);
             }
             else
             {
-                EntityManager.Render(OutputHandler);
+                EntityManager.Render(Renderer);
             }
 
-            OutputHandler.ReleaseSurface();
+            Renderer.ReleaseSurface();
         }
 
         public void WaitFrame()
         {
-            OutputHandler.WaitFrame();
+            Renderer.OutputHandler.WaitFrame();
         }
 
-        public bool Clean()
+        public void Clean()
         {
-            if (!IsRunning) { return false; }
+            if (!IsRunning)
+            {
+                Environment.Exit(1);
+                return; 
+            }
 
-            IsRunning = !(InputHandler.Disable() && OutputHandler.Disable());
+            Input.Disable();
+            Renderer.OutputHandler.Disable();
 
             /*_cursorKeysMode = VTCursorKeysMode.Normal;
             _keypadMode = VTKeypadMode.Numeric;*/
@@ -209,7 +197,7 @@ namespace Ax.Engine
 
             Environment.Exit(IsRunning ? 1 : 0);
 
-            return !IsRunning;
+            return;
         }        
     }
 }

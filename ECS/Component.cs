@@ -1,5 +1,5 @@
-﻿using Ax.Engine.Core;
-using Ax.Engine.ECS.Components;
+﻿using Ax.Engine.ECS.Components;
+using Ax.Engine.Core.Rendering;
 
 namespace Ax.Engine.ECS
 {
@@ -16,7 +16,7 @@ namespace Ax.Engine.ECS
 
         public virtual void Init() { }
         public virtual void Update() { }
-        public virtual void Render(OutputHandler outputHandler) { }
+        public virtual void Render(SurfaceRenderer renderer) { }
 
         // Entity implementation
         public bool HasComponent<T>() where T : Component => Entity.HasComponent<T>(); 

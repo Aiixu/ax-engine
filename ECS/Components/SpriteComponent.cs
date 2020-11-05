@@ -1,9 +1,7 @@
 ﻿using System.Drawing;
 
-using Ax.Engine.Core;
 using Ax.Engine.Utils;
-
-using Color = Ax.Engine.Utils.Color;
+using Ax.Engine.Core.Rendering;
 
 namespace Ax.Engine.ECS.Components
 {
@@ -46,13 +44,14 @@ namespace Ax.Engine.ECS.Components
             destRect.size = (Vector2Int)((Vector2)sourceRect.size * Transform.scale);
         }
 
-        public override void Render(OutputHandler outputHandler)
+        public override void Render(SurfaceRenderer renderer)
         {
             for (int y = 0; y < destRect.Height; y++)
             {
                 for (int x = 0; x < destRect.Width; x++)
                 {
-                    outputHandler.RenderCh(destRect.X + x, destRect.Y + y, 0, ' ', Color.Black, Color.FromColor(texture.GetPixel(x, y)));
+                    Color color = texture.GetPixel(x, y);
+                    renderer.Render(new RgbSurfaceItem(color), destRect.X + x, destRect.Y + y);
                 }
             }
         }

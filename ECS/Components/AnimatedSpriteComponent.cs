@@ -2,10 +2,8 @@
 using System.IO;
 using System.Drawing;
 
-using Ax.Engine.Core;
 using Ax.Engine.Utils;
-
-using Color = Ax.Engine.Utils.Color;
+using Ax.Engine.Core.Rendering;
 
 namespace Ax.Engine.ECS.Components
 {
@@ -21,7 +19,7 @@ namespace Ax.Engine.ECS.Components
         public RectInt sourceRect;
 
         /// <summary>
-        /// Delay between two animation frame update in milliseconds
+        ///  Delay between two animation frame update in milliseconds
         /// </summary>
         public float animationDelay;
 
@@ -64,17 +62,17 @@ namespace Ax.Engine.ECS.Components
             destRect.size = (Vector2Int)((Vector2)sourceRect.size * Transform.scale);
         }
 
-        public override void Render(OutputHandler outputHandler)
+        public override void Render(SurfaceRenderer renderer)
         {
             Bitmap frame = frames[currentFrame];
             for (int y = 0; y < frame.Height; y++)
             {
                 for (int x = 0; x < frame.Width; x++)
                 {
-                    System.Drawing.Color pixel = frame.GetPixel(x, y);
+                    Color pixel = frame.GetPixel(x, y);
                     if (pixel.A == 0) { continue; } // todo: implement alpha threshold
 
-                    outputHandler.RenderCh(destRect.X + x, destRect.Y + y, 0, ' ', Color.Black, Color.FromColor(pixel));
+                    renderer.Render(new RgbSurfaceItem(pixel), destRect.X + x, destRect.Y + y);
                 }
             }
         }

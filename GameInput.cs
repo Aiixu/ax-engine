@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Ax.Engine.Core;
 using Ax.Engine.Utils;
 
-using static Ax.Engine.Core.Native;
 using static Ax.Engine.Core.InputHandler;
+using static Ax.Engine.Core.Native.WinApi;
+using static Ax.Engine.Core.Native.WinUser;
 
 namespace Ax.Engine
 {

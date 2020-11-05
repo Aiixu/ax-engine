@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace Ax.Engine.Core.Rendering
 {
@@ -12,7 +13,11 @@ namespace Ax.Engine.Core.Rendering
             27, 91, 0, 56, 59, 50, 59, 48, 48, 48, 59, 48, 48, 48, 59, 48, 48, 48, 109
         };
 
-        public RgbSurfaceItem(byte red, byte green, byte blue) : this()
+        public RgbSurfaceItem(Color color)
+            : this(color.R, color.G, color.B)
+        { }
+
+        public RgbSurfaceItem(byte red, byte green, byte blue)
         {
             // TODO -> set
             zIndex = 0;

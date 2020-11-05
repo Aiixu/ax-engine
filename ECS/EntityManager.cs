@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Collections.Generic;
 
-using Ax.Engine.Core;
 using Ax.Engine.ECS.Components;
-using System.Diagnostics;
+using Ax.Engine.Core.Rendering;
 
 namespace Ax.Engine.ECS
 {
@@ -27,13 +26,13 @@ namespace Ax.Engine.ECS
             }
         }
 
-        public static void Render(OutputHandler outputHandler)
+        public static void Render(SurfaceRenderer renderer)
         {
             for (int i = 0; i < entities.Count; i++)
             {
                 if (!entities[i].IsActive) { continue; }
 
-                entities[i].Render(outputHandler);
+                entities[i].Render(renderer);
             }
         }
 

@@ -2,7 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 
-using static Ax.Engine.Core.Native;
+using static Ax.Engine.Core.Native.WinApi;
 
 namespace Ax.Engine.Core
 {

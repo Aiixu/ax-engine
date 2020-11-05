@@ -56,8 +56,8 @@ namespace Ax.Engine.Core.Rendering
             BeginWrtRecord();
 
             Console.SetCursorPosition(0, 0);
-            outputHandler.Write(buffer, positionInBuffer);
-            outputHandler.EndWrite();
+            OutputHandler.Write(buffer, positionInBuffer);
+            OutputHandler.EndWrite();
 
             EndWrtRecord();
 

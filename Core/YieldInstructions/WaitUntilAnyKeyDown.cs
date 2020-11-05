@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 
+using static Ax.Engine.Core.Native.WinUser;
+
 namespace Ax.Engine.Core
 {
     public sealed class WaitUntilAnyKeyDown : YieldInstruction

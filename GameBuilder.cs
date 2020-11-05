@@ -3,7 +3,9 @@ using System.Threading;
 
 using Ax.Engine.Core;
 using Ax.Engine.Core.Rendering;
-using static Ax.Engine.Core.Native;
+
+using static Ax.Engine.Core.Native.WinApi;
+using static Ax.Engine.Core.Native.WinUser;
 
 namespace Ax.Engine
 {
@@ -17,25 +19,24 @@ namespace Ax.Engine
 
         public string DebugFolderPath { get; private set; } = "logs";
 
-        public int MaximumFpsCount    { get; set; } = 30;
+        public int MaximumFpsCount    { get; private set; } = 30;
 
         // TODO -> set default
-        public string FontName { get; set; }
-        public int FontWidth { get; set; }
-        public int FontHeight { get; set; }
+        public string FontName { get; private set; }
+        public int FontWidth { get; private set; }
+        public int FontHeight { get; private set; }
 
-        public bool CursorVisible { get; set; } = false;
+        public bool CursorVisible { get; private set; } = false;
 
-        public Type Renderer { get; set; } = typeof(QueuedSurfaceRenderer);
+        public Type RendererType { get; private set; }
+        public Type OutputHandlerType { get; private set; }
 
-        public GameBuilder SetRenderer(Type renderer) 
+        public GameBuilder SetRenderer<TRenderer, TOutputHandler>()
+            where TRenderer : SurfaceRenderer
+            where TOutputHandler : OutputHandler
         {
-            if(!typeof(ISurfaceRenderer).IsAssignableFrom(renderer))
-            {
-                throw new Exception($"{renderer} doesn't inherit from ISurfaceRenderer");
-            }
-
-            Renderer = renderer;
+            RendererType = typeof(TRenderer);
+            OutputHandlerType = typeof(TOutputHandler);
 
             return this;
         }
@@ -98,11 +99,13 @@ namespace Ax.Engine
             return this;
         }
 
-        public Game Build(bool disableNewLineAutoReturn = false, uint flags = 0)
+        public Game Build(uint flags = 0)
         {
             Logger.DebugFolderPath = DebugFolderPath;
 
-            OutputHandler outputHandler = new OutputHandler();
+            OutputHandler outputHandler = (OutputHandler)Activator.CreateInstance(OutputHandlerType);
+            SurfaceRenderer surfaceRenderer = new QueuedSurfaceRenderer(outputHandler, WindowWidth, WindowHeight);
+
             InputHandler inputHandler = new InputHandler();
 
             bool isRunning = true;
@@ -126,16 +129,7 @@ namespace Ax.Engine
 
             Thread.Sleep(100);
 
-            Game.WindowWidth = WindowWidth;
-            Game.WindowHeight = WindowHeight;
-
-            Game.WindowWidthInPixels = WindowWidth * FontWidth;
-            Game.WindowHeightInPixels = WindowHeight * FontHeight;
-
-            Game.FontWidth = FontWidth;
-            Game.FontHeight = FontHeight;
-
-            return new Game(hWnd, hMenu, outputHandler, inputHandler, isRunning);
+            return new Game(surfaceRenderer, inputHandler, isRunning);
         }
     }
 }

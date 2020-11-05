@@ -1,6 +1,6 @@
 ﻿namespace Ax.Engine.Core
 {
-    public sealed class OutputHandler
+    public sealed class OutputHandler_
     {
 
         /*

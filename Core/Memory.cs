@@ -5,18 +5,18 @@ using System.Runtime.InteropServices;
 
 namespace Ax.Engine.Core
 {
-    internal static class Memory
+    public static class Memory
     {
         private delegate void MemorySetter(IntPtr array, byte value, int count);
 
-        private static MemorySetter MemsetDelegate;
+        private static readonly MemorySetter MemsetDelegate;
 
         static Memory()
         {
             // Initialize Memset
             DynamicMethod m = new DynamicMethod("memset", 
                 MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, 
-                typeof(void), new[] { typeof(IntPtr), typeof(byte), typeof(int) }, typeof(OutputHandler), false);
+                typeof(void), new[] { typeof(IntPtr), typeof(byte), typeof(int) }, typeof(Memory), false);
 
             ILGenerator il = m.GetILGenerator();
             il.Emit(OpCodes.Ldarg_0); // address

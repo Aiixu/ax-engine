@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-using static Ax.Engine.Core.Native;
+using static Ax.Engine.Core.Native.WinApi;
 
 namespace Ax.Engine.Core.Rendering
 {

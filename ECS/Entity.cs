@@ -1,4 +1,5 @@
 ﻿using Ax.Engine.Core;
+using Ax.Engine.Core.Rendering;
 using Ax.Engine.ECS.Components;
 
 using System;
@@ -26,11 +27,11 @@ namespace Ax.Engine.ECS
             }
         }
 
-        public void Render(OutputHandler outputHandler)
+        public void Render(SurfaceRenderer renderer)
         {
             for (int i = 0; i < Components.Count; i++)
             {
-                Components[i].Render(outputHandler);
+                Components[i].Render(renderer);
             }
         }
 

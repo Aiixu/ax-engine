@@ -5,12 +5,11 @@ namespace Ax.Engine.Core.Rendering
 {
     public abstract class SurfaceRenderer
     {
+        public OutputHandler OutputHandler { get; private set; }
         public RenderData LastRenderData { get; private set; }
 
         public readonly int screenWidth;
         public readonly int screenHeight;
-
-        protected OutputHandler outputHandler;
 
         private readonly Stopwatch clcStopwatch;
         private readonly Stopwatch relStopwatch;
@@ -24,9 +23,9 @@ namespace Ax.Engine.Core.Rendering
 
         public SurfaceRenderer(OutputHandler outputHandler, int screenWidth, int screenHeight, bool mesureTime = true)
         {
-            outputHandler.Enable();
+            OutputHandler.Enable();
+            OutputHandler = outputHandler;
 
-            this.outputHandler = outputHandler;
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
 

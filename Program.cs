@@ -1,10 +1,9 @@
 ﻿using System;
 
-using Ax.Engine.Core;
-using Ax.Engine.Core.Rendering;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
+using Ax.Engine.Core.Rendering;
 
 namespace Ax.Engine
 {
@@ -14,8 +13,6 @@ namespace Ax.Engine
 
         public static void Main(string[] _)
         {
-            Console.WriteLine(string.Join(", ", Console.OutputEncoding.GetBytes("\x1b[2J")));
-
             game = new GameBuilder()
                 .SetTitle("Engine demo")
                 .SetFont("Lucidas Console", 10, 10)
@@ -23,9 +20,8 @@ namespace Ax.Engine
                 .SetPosition(5, 5)
                 .SetCursorVisible(false)
                 .LimitFPS(15)
-                .SetRenderer(typeof(SurfaceRenderer<RgbSurfaceItem>))
+                .SetRenderer<QueuedSurfaceRenderer, OutputHandler>()
                 .Build();
-
 
             /*
             Stopwatch a = new Stopwatch();
