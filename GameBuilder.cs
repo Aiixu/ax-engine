@@ -1,54 +1,41 @@
 ﻿using System;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading;
 
 using Ax.Engine.Core;
-
+using Ax.Engine.Core.Rendering;
 using static Ax.Engine.Core.Native;
-using static Ax.Engine.Utils.DefaultValue;
 
 namespace Ax.Engine
 {
     public sealed class GameBuilder
     {
-        public string WindowName;
-        public int WindowWidth;
-        public int WindowHeight;
-        public int WindowLeft;
-        public int WindowTop;
+        public string WindowName      { get; private set; } = Console.Title;
+        public int WindowWidth        { get; private set; } = Console.WindowWidth;
+        public int WindowHeight       { get; private set; } = Console.WindowHeight;
+        public int WindowLeft         { get; private set; } = Console.WindowLeft;
+        public int WindowTop          { get; private set; } = Console.WindowTop;
 
-        public string DebugFolderPath;
+        public string DebugFolderPath { get; private set; } = "logs";
 
-        public int FPS;
+        public int MaximumFpsCount    { get; set; } = 30;
 
-        public string FontName;
-        public int FontWidth;
-        public int FontHeight;
+        // TODO -> set default
+        public string FontName { get; set; }
+        public int FontWidth { get; set; }
+        public int FontHeight { get; set; }
 
-        public bool CursorVisible = false;
+        public bool CursorVisible { get; set; } = false;
 
-        public OutputHandler.RenderingMode RenderingMode;
-        public int RenderingThreadCount;
+        public Type Renderer { get; set; } = typeof(QueuedSurfaceRenderer);
 
-        public GameBuilder SetRenderingMode(OutputHandler.RenderingMode renderingMode)
+        public GameBuilder SetRenderer(Type renderer) 
         {
-            RenderingMode = renderingMode;
-
-            return this;
-        }
-
-        public GameBuilder SetRenderingThreadCount(int renderingThreadCount)
-        {
-            if(!RenderingMode.HasFlag(OutputHandler.RenderingMode.MultiThreaded))
+            if(!typeof(ISurfaceRenderer).IsAssignableFrom(renderer))
             {
-                throw new Exception("Please make sure to enable multi threaded rendering in order to set rendering thread count");
+                throw new Exception($"{renderer} doesn't inherit from ISurfaceRenderer");
             }
 
-            if(renderingThreadCount == 0 || renderingThreadCount % 2 != 0)
-            {
-                throw new Exception("Rendering thread count should be greater than 1 (since 1 = 1 thread) and a power of two");
-            }
+            Renderer = renderer;
 
             return this;
         }
@@ -106,43 +93,33 @@ namespace Ax.Engine
 
         public GameBuilder LimitFPS(int fps)
         {
-            FPS = fps;
+            MaximumFpsCount = fps;
 
             return this;
         }
 
         public Game Build(bool disableNewLineAutoReturn = false, uint flags = 0)
         {
-            Default(ref WindowName, StringNotNullOrEmpty, Console.Title);
-            Default(ref WindowWidth,IntegerPositive, Console.WindowWidth);
-            Default(ref WindowHeight,IntegerPositive, Console.WindowHeight);
-            Default(ref WindowLeft, IntegerPositiveOrZero, Console.WindowLeft);
-            Default(ref WindowTop, IntegerPositiveOrZero, Console.WindowTop);
-            Default(ref DebugFolderPath, StringNotNullOrEmpty, "logs");
-
             Logger.DebugFolderPath = DebugFolderPath;
-            StringBuilder logger = new StringBuilder();
+
+            OutputHandler outputHandler = new OutputHandler();
+            InputHandler inputHandler = new InputHandler();
 
             bool isRunning = true;
 
             IntPtr hWnd = GetConsoleWindow();
             IntPtr hMenu = GetSystemMenu(hWnd, false);
 
-            logger.AppendLine($"HWND           {hWnd}");
-            logger.AppendLine($"HMENU          {hMenu}");
-            
-            logger.AppendLine($"DELMENU_MIN    {isRunning &= DeleteMenu(hMenu, (int)SC.MINIMIZE, (int)MF.BYCOMMAND)}");
-            logger.AppendLine($"DELMENU_MAX    {isRunning &= DeleteMenu(hMenu, (int)SC.MAXIMIZE, (int)MF.BYCOMMAND)}");
-            logger.AppendLine($"DELMENU_SIZ    {isRunning &= DeleteMenu(hMenu, (int)SC.SIZE, (int)MF.BYCOMMAND)}");
+            isRunning &= DeleteMenu(hMenu, (int)SC.MINIMIZE, (int)MF.BYCOMMAND);
+            isRunning &= DeleteMenu(hMenu, (int)SC.MAXIMIZE, (int)MF.BYCOMMAND);
+            isRunning &= DeleteMenu(hMenu, (int)SC.SIZE, (int)MF.BYCOMMAND);
 
-            OutputHandler outputHandler = new OutputHandler();
-            InputHandler inputHandler = new InputHandler();
+            isRunning &= SetWindowPos(hWnd, new IntPtr(0), WindowLeft, WindowTop, 0, 0, flags | (uint)SWP.SHOWWINDOW | (uint)SWP.NOSIZE);
+            isRunning &= SetConsoleTitle(WindowName);
 
-            logger.AppendLine($"SETWINPOS      {isRunning &= SetWindowPos(hWnd, new IntPtr(0), WindowLeft, WindowTop, 0, 0, flags | (uint)SWP.SHOWWINDOW | (uint)SWP.NOSIZE)}");
-            logger.AppendLine($"SETWINTXT      {isRunning &= SetConsoleTitle(WindowName)}");
+            isRunning &= inputHandler.Enable();
 
-            logger.AppendLine($"INHANDLER      {isRunning &= inputHandler.Enable(ref logger)}");
-            logger.AppendLine($"OUTHANDLER     {outputHandler.Enable(ref logger, RenderingMode, FontName, FontWidth, FontHeight, CursorVisible, disableNewLineAutoReturn, 1000 / FPS)}");
+            //outputHandler.Enable(ref logger, RenderingMode, FontName, FontWidth, FontHeight, CursorVisible, disableNewLineAutoReturn, 1000 / MaximumFpsCount)}");
 
             Console.SetWindowSize(WindowWidth, WindowHeight);
             Console.SetBufferSize(WindowWidth, WindowHeight);
@@ -157,8 +134,6 @@ namespace Ax.Engine
 
             Game.FontWidth = FontWidth;
             Game.FontHeight = FontHeight;
-
-            Logger.Write(logger.ToString());
 
             return new Game(hWnd, hMenu, outputHandler, inputHandler, isRunning);
         }

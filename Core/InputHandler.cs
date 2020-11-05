@@ -23,24 +23,14 @@ namespace Ax.Engine.Core
         //internal static Dictionary<uint, uint> lastMouseButtonStates = new Dictionary<uint, uint>();
         internal static Dictionary<uint, List<uint>> currentMouseButtonStates = new Dictionary<uint, List<uint>>();
 
-        public bool Enable(ref StringBuilder logger)
+        public bool Enable()
         {
-            bool stdIn;
-
-            logger.AppendLine($"GETSTDIN       {stdIn = GetStdIn(out handle)}");
-
-            if (!stdIn) { return false; }
-            if (!GetConsoleModeIn(Handle, ref logger, out inLast)) { return false; }
+            if (!GetStdIn(out handle)) { return false; }
+            if (!GetConsoleModeIn(Handle, out inLast)) { return false; }
 
             CONSOLE_MODE_INPUT mode = inLast | CONSOLE_MODE_INPUT.ENABLE_VIRTUAL_TERMINAL_INPUT;
 
-            logger.AppendLine($"INLAST         {inLast}");
-            logger.AppendLine($"INMODE         {mode}");
-
-            bool cMode;
-            logger.AppendLine($"SETCMODEIN     {cMode = SetConsoleMode(Handle, (uint)mode)}");
-
-            return cMode;
+            return SetConsoleMode(Handle, (uint)mode);
         }
 
         public bool Disable()
@@ -105,12 +95,9 @@ namespace Ax.Engine.Core
             return handle != INVALID_HANDLE;
         }
 
-        private bool GetConsoleModeIn(IntPtr hConsoleHandle, ref StringBuilder logger, out CONSOLE_MODE_INPUT mode)
+        private bool GetConsoleModeIn(IntPtr hConsoleHandle, out CONSOLE_MODE_INPUT mode)
         {
-            bool cMode;
-            logger.AppendLine($"GETCMODEIN     {cMode = GetConsoleMode(hConsoleHandle, out uint lpMode)}");
-
-            if (!cMode)
+            if (!GetConsoleMode(hConsoleHandle, out uint lpMode))
             {
                 mode = 0;
                 return false;

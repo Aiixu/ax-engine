@@ -5,7 +5,6 @@ using Ax.Engine.Core.Rendering;
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
-using System.Threading;
 
 namespace Ax.Engine
 {
@@ -15,6 +14,9 @@ namespace Ax.Engine
 
         public static void Main(string[] __)
         {
+            Console.WriteLine(string.Join(", ", Console.OutputEncoding.GetBytes("\x1b[2J")));
+
+            /*
             game = new GameBuilder()
                 .SetTitle("Engine demo")
                 .SetFont("Lucidas Console", 10, 10)
@@ -22,24 +24,11 @@ namespace Ax.Engine
                 .SetPosition(5, 5)
                 .SetCursorVisible(false)
                 .LimitFPS(15)
-                .SetRenderingMode(OutputHandler.RenderingMode.VTColorOnlyBackground)
+                .SetRenderer(typeof(SurfaceRenderer<RgbSurfaceItem>))
                 .Build();
-            
-            SurfaceRenderer renderer = new QueuedSurfaceRenderer(game.OutputHandler.Handle, 80, 50);
+            */
 
-            int n = 10000000;
-            for (int i = 0; i < n; i++)
-            {
-                renderer.ReleaseSurface();
-            }
-            // 27002143
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.WriteLine();
-            Console.WriteLine(((QueuedSurfaceRenderer)renderer).total);
 
-            Console.Read();
-            return;
-            
             /*
             Stopwatch a = new Stopwatch();
             a.Start();
@@ -94,7 +83,7 @@ namespace Ax.Engine
 
             Yielder.StartCoroutine(TestMouseButtonCoroutine());
             */
-            OutputHandler.RenderData average = new OutputHandler.RenderData();
+
             int iterations = 0;
             int iterationCount = 10;
 
@@ -103,9 +92,10 @@ namespace Ax.Engine
                 game.HandleEvents();
                 game.Update();
                 game.Render();
+                game.WaitFrame();
 
                 //Console.WriteLine(GameInput.GetMouseButtonDown(MOUSE_BUTTON.FROM_LEFT_1ST_BUTTON_PRESSED));
-
+                /*
                 iterations++;
 
                 average.CalculationTime += game.OutputHandler.LastFrameData.CalculationTime;
@@ -119,8 +109,7 @@ namespace Ax.Engine
                     average = new OutputHandler.RenderData();
                     iterations = 0;
                 }
-
-                game.WaitFrame();
+                */
             }
 
             game.Clean();

@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="Core\Collisions.cs" />
     <Compile Include="Core\Coroutine.cs" />
+    <Compile Include="Core\Memory.cs" />
     <Compile Include="Core\NativeEnums\BUFFER_ACCESS_MODE.cs" />
     <Compile Include="Core\NativeEnums\BUFFER_SHARE_MODE.cs" />
     <Compile Include="Core\NativeEnums\CHAR_ATTRIBUTE.cs" />
@@ -130,8 +131,12 @@
     <Compile Include="Core\NativeStructs\MENU_EVENT_RECORD.cs" />
     <Compile Include="Core\NativeStructs\SMALL_RECT.cs" />
     <Compile Include="Core\NativeStructs\WINDOW_BUFFER_SIZE_RECORD .cs" />
-    <Compile Include="Core\Rendering\Color.cs" />
+    <Compile Include="Core\Rendering\ISurfaceRenderer.cs" />
+    <Compile Include="Core\Rendering\OutputHandlers\DoubleBufferedOutputHandler.cs" />
+    <Compile Include="Core\Rendering\OutputHandlers\OutputHandler.cs" />
+    <Compile Include="Core\Rendering\SurfaceItems\RgbSurfaceItem.cs" />
     <Compile Include="Core\Rendering\ISurfaceItem.cs" />
+    <Compile Include="Core\Rendering\SurfaceRenderers\DoubleBufferedSurfaceRenderer.cs" />
     <Compile Include="Core\Yielder.cs" />
     <Compile Include="Core\YieldInstructions\WaitForEndOfFrame.cs" />
     <Compile Include="Core\YieldInstructions\WaitForFrameCount.cs" />
@@ -157,8 +162,8 @@
     <Compile Include="Game.cs" />
     <Compile Include="GameBuilder.cs" />
     <Compile Include="GameInput.cs" />
-    <Compile Include="Core\Rendering\Queued\QueuedSurfaceRenderer.cs" />
-    <Compile Include="Core\Rendering\SurfaceRenderer.cs" />
+    <Compile Include="Core\Rendering\SurfaceRenderers\QueuedSurfaceRenderer.cs" />
+    <Compile Include="Core\Rendering\SurfaceRenderers\SurfaceRenderer.cs" />
     <Compile Include="Utils\Color.cs" />
     <Compile Include="Utils\DefaultValue.cs" />
     <Compile Include="Utils\MathHelper.cs" />
