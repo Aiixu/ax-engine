@@ -23,14 +23,14 @@ namespace Ax.Engine.Core
         //internal static Dictionary<uint, uint> lastMouseButtonStates = new Dictionary<uint, uint>();
         internal static Dictionary<uint, List<uint>> currentMouseButtonStates = new Dictionary<uint, List<uint>>();
 
-        public bool Enable()
+        public void Enable()
         {
-            if (!GetStdIn(out handle)) { return false; }
-            if (!GetConsoleModeIn(Handle, out inLast)) { return false; }
+            GetStdIn(out handle);
+            GetConsoleModeIn(Handle, out inLast);
 
             CONSOLE_MODE_INPUT mode = inLast | CONSOLE_MODE_INPUT.ENABLE_VIRTUAL_TERMINAL_INPUT;
 
-            return SetConsoleMode(Handle, (uint)mode);
+            SetConsoleMode(Handle, (uint)mode);
         }
 
         public bool Disable()
@@ -76,12 +76,14 @@ namespace Ax.Engine.Core
                         break;
 
                     case (ushort)INPUT_RECORD_EVENT_TYPE.MOUSE_EVENT:
+                        /*
                         if(!currentMouseButtonStates.ContainsKey(rec[i].MouseEvent.dwButtonState))
                         {
                             currentMouseButtonStates[rec[i].MouseEvent.dwButtonState] = new List<uint>();
                         }
 
                         currentMouseButtonStates[rec[i].MouseEvent.dwButtonState].Add(rec[i].MouseEvent.dwEventFlags);
+                        */
                         break;
                 }
             }

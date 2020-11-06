@@ -58,17 +58,19 @@ namespace Ax.Engine.Core
             IntPtr hdcSrc = GetWindowDC(handle);
 
             RECT windowRect = new RECT();
-            GetWindowRect(handle, ref windowRect);
+            GetClientRect(handle, ref windowRect);
+
+            int titleBarHeight = (GetSystemMetrics((int)SM.CYFRAME) + GetSystemMetrics((int)SM.CYCAPTION) + GetSystemMetrics((int)SM.CXPADDEDBORDER));
 
             int width = windowRect.right - windowRect.left;
-            int height = windowRect.bottom - windowRect.top;
+            int height = windowRect.bottom - windowRect.top - titleBarHeight;
 
             IntPtr hdcDest = CreateCompatibleDC(hdcSrc);
             IntPtr hBitmap = CreateCompatibleBitmap(hdcSrc, width, height);
 
             IntPtr hOld = SelectObject(hdcDest, hBitmap);
 
-            BitBlt(hdcDest, 0, 0, width, height, hdcSrc, 0, 0, (int)BITBLT_OP.SRCCOPY);
+            BitBlt(hdcDest, 0, 0, width, height, hdcSrc, 8, 1 + titleBarHeight, (int)BITBLT_OP.SRCCOPY);
 
             SelectObject(hdcDest, hOld);
             DeleteDC(hdcDest);

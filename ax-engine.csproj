@@ -68,7 +68,7 @@
     <Compile Include="Core\Collisions.cs" />
     <Compile Include="Core\Coroutine.cs" />
     <Compile Include="Core\Imaging.cs" />
-    <Compile Include="Core\Memory.cs" />
+    <Compile Include="Core\MemoryHelper.cs" />
     <Compile Include="Core\Native\WinApi\Enums\BUFFER_ACCESS_MODE.cs" />
     <Compile Include="Core\Native\WinApi\Enums\BUFFER_SHARE_MODE.cs" />
     <Compile Include="Core\Native\WinApi\Enums\CHAR_ATTRIBUTE.cs" />
@@ -110,6 +110,7 @@
     <Compile Include="Core\Native\WinUser\Enums\RECT.cs" />
     <Compile Include="Core\Native\WinUser\Enums\SC.cs" />
     <Compile Include="Core\Native\WinUser\Enums\SCF.cs" />
+    <Compile Include="Core\Native\WinUser\Enums\SM.cs" />
     <Compile Include="Core\Native\WinUser\Enums\SWP.cs" />
     <Compile Include="Core\Native\WinGDI\Enums\TMPF.cs" />
     <Compile Include="Core\Native\WinApi\Methods\ConsoleText.cs" />
@@ -117,8 +118,9 @@
     <Compile Include="Core\Native\WinApi\Methods\ConsoleRead.cs" />
     <Compile Include="Core\Native\WinApi\Methods\ConsoleHandles.cs" />
     <Compile Include="Core\Native\WinGDI\Methods\Imaging.cs" />
+    <Compile Include="Core\Native\WinUser\Methods\Client.cs" />
+    <Compile Include="Core\Native\WinUser\Methods\Metrics.cs" />
     <Compile Include="Core\Native\WinUser\Methods\Window.cs" />
-    <Compile Include="Core\OutputHandler.cs" />
     <Compile Include="Core\Native\WinApi\Structs\CHAR_INFO.cs" />
     <Compile Include="Core\Native\WinApi\Structs\CONSOLE_FONT_INFOEX.cs" />
     <Compile Include="Core\Native\WinApi\Structs\CONSOLE_READCONSOLE_CONTROL.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="Core\Rendering\OutputHandlers\SingleBufferedOutputHandler.cs" />
     <Compile Include="Core\Rendering\SurfaceItems\RgbSurfaceItem.cs" />
     <Compile Include="Core\Rendering\ISurfaceItem.cs" />
+    <Compile Include="Core\Rendering\SurfaceRenderers\SimpleColorOnlySurfaceRenderer.cs" />
     <Compile Include="Core\Yielder.cs" />
     <Compile Include="Core\YieldInstructions\WaitForEndOfFrame.cs" />
     <Compile Include="Core\YieldInstructions\WaitForFrameCount.cs" />

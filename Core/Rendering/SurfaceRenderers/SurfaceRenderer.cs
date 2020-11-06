@@ -11,10 +11,10 @@ namespace Ax.Engine.Core.Rendering
         public readonly int screenWidth;
         public readonly int screenHeight;
 
-        private readonly Stopwatch clcStopwatch;
-        private readonly Stopwatch relStopwatch;
-        private readonly Stopwatch wrtStopwatch;
-        private readonly Stopwatch glbStopwatch;
+        protected readonly Stopwatch clcStopwatch;
+        protected readonly Stopwatch relStopwatch;
+        protected readonly Stopwatch wrtStopwatch;
+        protected readonly Stopwatch glbStopwatch;
 
         protected ISurfaceItem[,] surface;
         protected bool[,] surfaceSet;
@@ -23,8 +23,8 @@ namespace Ax.Engine.Core.Rendering
 
         public SurfaceRenderer(OutputHandler outputHandler, int screenWidth, int screenHeight, bool mesureTime = true)
         {
-            OutputHandler.Enable();
             OutputHandler = outputHandler;
+            OutputHandler.Enable();
 
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
@@ -76,7 +76,7 @@ namespace Ax.Engine.Core.Rendering
             };
         }
 
-        private void BeginRecord(Stopwatch stopwatch) => stopwatch?.Stop();
+        private void BeginRecord(Stopwatch stopwatch) => stopwatch?.Start();
 
         private void EndRecord(Stopwatch stopwatch) => stopwatch?.Stop();
 

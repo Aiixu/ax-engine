@@ -9,7 +9,6 @@ namespace Ax.Engine.Core.Rendering
     public abstract class OutputHandler
     {
         public IntPtr Handle { get; protected set; }
-        public RenderData LastRenderData { get; private set; }
 
         protected OutputHandlerInfo Info { get; private set; }
 

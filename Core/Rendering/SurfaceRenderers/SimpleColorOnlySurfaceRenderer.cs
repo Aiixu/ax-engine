@@ -4,12 +4,12 @@ using static Ax.Engine.Core.MemoryHelper;
 
 namespace Ax.Engine.Core.Rendering
 {
-    internal sealed class QueuedSurfaceRenderer : SurfaceRenderer
+    internal sealed class SimpleColorOnlySurfaceRenderer : SurfaceRenderer
     {
-        public QueuedSurfaceRenderer(OutputHandler outputHandler, int screenWidth, int screenHeight)
-            : base(outputHandler, screenWidth, screenHeight)
+        public SimpleColorOnlySurfaceRenderer(OutputHandler outputHandler, int screenWidth, int screenHeight, bool mesureTime = true)
+            : base(outputHandler, screenWidth, screenHeight, mesureTime)
         { }
-        
+
         public override void ReleaseSurface()
         {
             BeginRelRecord();
@@ -34,8 +34,8 @@ namespace Ax.Engine.Core.Rendering
             {
                 int count = 1;
                 while (
-                    i < flattenSurface.Length - 1 && 
-                    ((!flattenSurfaceSet[i] && !flattenSurfaceSet[i + 1]) || 
+                    i < flattenSurface.Length - 1 &&
+                    ((!flattenSurfaceSet[i] && !flattenSurfaceSet[i + 1]) ||
                     (flattenSurfaceSet[i] && flattenSurface[i].Equals(flattenSurface[i + 1]))))
                 {
                     i++;
@@ -55,7 +55,6 @@ namespace Ax.Engine.Core.Rendering
             }
 
             EndRelRecord();
-
             BeginWrtRecord();
 
             Console.SetCursorPosition(0, 0);

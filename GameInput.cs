@@ -63,33 +63,22 @@ namespace Ax.Engine
 
         public static bool GetMouseButtonDown(MOUSE_BUTTON button)
         {
-            uint uButton = (uint)button;
-            //Console.WriteLine(currentMouseButtonStates.ContainsKey(uButton) ? currentMouseButtonStates[uButton].Count : 0);
-            return currentMouseButtonStates.ContainsKey(uButton) && 
-                currentMouseButtonStates[uButton].Count == 1 && 
-                (currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.CLICK_OR_RELEASE) || currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.DOUBLE_CLICK));
+            return false;
         }
 
         public static bool GetMouseButton(MOUSE_BUTTON button)
         {
-            //return currentMouseButtonStates.ContainsKey((uint)button);
             return false;
         }
 
         public static bool GetMouseButtonUp(MOUSE_BUTTON button)
         {
-            uint uButton = (uint)button;
-            return currentMouseButtonStates.ContainsKey(uButton) && 
-                currentMouseButtonStates[uButton].Count == 2 && 
-                currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.CLICK_OR_RELEASE) &&
-                currentMouseButtonStates[uButton].Contains((uint)MOUSE_EVENT_FLAGS.MOUSE_MOVED);
+            return false;
         }
 
         public static int GetMouseWheelVertical()
         {
             return 0;
-            /*return currentMouseButtonStates.ContainsValue((uint)MOUSE_EVENT_FLAGS.MOUSE_WHEELED) ?
-                currentMouseButtonStates.ContainsKey((uint)MOUSE_BUTTON.WHEEL_DOWN) ? -1 : 1 : 0;*/
         }
 
         internal static void InvokeEvents()

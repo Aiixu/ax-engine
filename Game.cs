@@ -21,11 +21,10 @@ namespace Ax.Engine
 
         public int FrameCount { get; private set; } = 0;
 
-        //public OutputHandler OutputHandler { get; private set; }
         public InputHandler Input { get; private set; }
         public SurfaceRenderer Renderer { get; private set; }
 
-        public Game(SurfaceRenderer renderer, InputHandler inputHandler, bool isRunning) 
+        public Game(SurfaceRenderer renderer, InputHandler inputHandler) 
         {
             if (Instance != null)
             {
@@ -36,7 +35,7 @@ namespace Ax.Engine
             Renderer = renderer;
             Input = inputHandler;
 
-            IsRunning = isRunning;
+            IsRunning = true;
 
             Instance = this;
         }
@@ -55,47 +54,16 @@ namespace Ax.Engine
 
             Input.UpdateInputStates(recs);
             //InputHandler.Read(out _);
-            //FlushConsoleInputBuffer(OutputHandler.Handle);
+            //FlushConsoleInputBuffer(IutputHandler.Handle);
             //InputHandler.Read()
 
             GameInput.InvokeEvents();
 
             // Built-in event handling
-            if (GameInput.GetKeyDown(KEY.F12) && FrameCount > 1)
+            if (GameInput.GetKeyDown(KEY.F2) && FrameCount > 1)
             {
                 new Thread(TakeScreenshot).Start();
             }
-            /*
-            if(eventCount == 0) { return; }
-
-
-            Console.Clear();
-
-            Console.WriteLine(eventCount);
-
-            FieldInfo[] fields = typeof(INPUT_RECORD).GetFields();
-            object[,] inputTable = new object[eventCount + 1, fields.Length + 14];
-
-            int y = 1;
-            for (int i = 0; i < fields.Length; i++)
-            {
-                FieldInfo[] subFields = fields[i].FieldType.GetFields();
-                inputTable[0, y++] = $"== {fields[i].Name}";
-
-                for (int j = 0; j < subFields.Length; j++)
-                {
-                    if(i != 0) { inputTable[0, y++] = subFields[j].Name; }
-
-                    for (int k = 0; k < eventCount; k++)
-                    {
-                        inputTable[k + 1, 0] = $"Event [{k + 1}]";
-                        inputTable[k + 1, y - 1] = i == 0 ? fields[i].GetValue(recs[k]) : subFields[j].GetValue(fields[i].GetValue(recs[k]));
-                    }
-                }
-            }
-
-            Console.WriteLine(Logger.GenTable(inputTable));
-            */
 
             return;
         }
@@ -103,25 +71,9 @@ namespace Ax.Engine
         public void TakeScreenshot()
         {
             if (!Directory.Exists("screenshots")) { Directory.CreateDirectory("screenshots"); }
-            /*
-            Bitmap bmp = new Bitmap(WindowWidthInPixels, WindowHeightInPixels);
 
-            for (int y = 0; y < WindowHeight; y++)
-            {
-                for (int x = 0; x < WindowWidth; x++)
-                {
-                    for (int py = 0; py < FontHeight; py++)
-                    {
-                        for (int px = 0; px < FontWidth; px++)
-                        {
-                            bmp.SetPixel(x * FontWidth + px, y * FontHeight + py, Color.ToColor(surface[x, y]?.color ?? Color.Black));
-                        }
-                    }
-                }
-            }
-            
             string outPath = Path.Combine("screenshots", string.Concat(DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-ff"), ".png"));
-            bmp.Save(outPath, ImageFormat.Png);*/
+            Imaging.CaptureWindowToFile(GetConsoleWindow(), outPath);
         }
 
         public void Update()

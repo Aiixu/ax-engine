@@ -40,7 +40,7 @@ namespace Ax.Engine.Core.Native
         /// </summary>
         /// <param name="hWnd">A handle to the window with a device context that is to be retrieved. If this value is NULL, GetWindowDC retrieves the device context for the entire screen.</param>
         /// <returns>If the function succeeds, the return value is a handle to a device context for the specified window. If the function fails, the return value is NULL, indicating an error or an invalid hWnd parameter.</returns>
-        [DllImport("user32.dll")] public static extern IntPtr GetWindowDC(IntPtr hWnd);
+        [DllImport("user32.dll")] public static extern IntPtr GetWindowDC([In] IntPtr hWnd);
 
         /// <summary>
         ///  Releases a device context (DC), freeing it for use by other applications. The effect of the ReleaseDC function depends on the type of DC. It frees only common and window DCs. It has no effect on class or private DCs.
@@ -48,7 +48,7 @@ namespace Ax.Engine.Core.Native
         /// <param name="hWnd">A handle to the window whose DC is to be released.</param>
         /// <param name="hDC">A handle to the DC to be released.</param>
         /// <returns>The return value indicates whether the DC was released. If the DC was released, the return value is 1. If the DC was not released, the return value is zero.</returns>
-        [DllImport("user32.dll")] public static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDC);
+        [DllImport("user32.dll")] public static extern IntPtr ReleaseDC([In] IntPtr hWnd, [In] IntPtr hDC);
 
         /// <summary>
         ///  Retrieves the dimensions of the bounding rectangle of the specified window. The dimensions are given in screen coordinates that are relative to the upper-left corner of the screen.
@@ -56,7 +56,7 @@ namespace Ax.Engine.Core.Native
         /// <param name="hWnd">A handle to the window.</param>
         /// <param name="lpRect">A pointer to a <see cref="RECT"/> structure that receives the screen coordinates of the upper-left and lower-right corners of the window.</param>
         /// <returns>If the function succeeds, returns TRUE, otherwise, retun FALSE.</returns>
-        [DllImport("user32.dll")] public static extern IntPtr GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+        [DllImport("user32.dll")] public static extern IntPtr GetWindowRect([In] IntPtr hWnd, [In, Out] ref RECT lpRect);
 
         /// <summary>
         ///  Retrieves a handle to the desktop window. The desktop window covers the entire screen. The desktop window is the area on top of which other windows are painted.
