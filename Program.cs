@@ -3,7 +3,11 @@
 using Ax.Engine.Utils;
 using Ax.Engine.ECS;
 using Ax.Engine.ECS.Components;
+using Ax.Engine.Core.Native;
 using Ax.Engine.Core.Rendering;
+using System.Diagnostics;
+using System.Threading;
+using Ax.Engine.Core;
 
 namespace Ax.Engine
 {
@@ -16,11 +20,11 @@ namespace Ax.Engine
             game = new GameBuilder()
                 .SetTitle("Engine demo")
                 .SetFont("Lucidas Console", 10, 10)
-                .SetSize(120, 50)
+                .SetWindowSize(120, 45)
                 .SetPosition(5, 5)
                 .SetCursorVisible(false)
-                .LimitFPS(30)
-                .SetRenderer<SimpleColorOnlySurfaceRenderer, SingleBufferedOutputHandler>()
+                .LimitFPS(20)
+                .SetRenderer<SimpleColorOnlySurfaceRenderer, DoubleBufferedOutputHandler>()
                 .Build();
 
             game.OpenDevMenu = false;
@@ -30,37 +34,33 @@ namespace Ax.Engine
             // Create camera
             EntityManager.AddEntity().AddComponent<CameraComponent>();
 
-            AnimatedSpriteComponent animatedCharacter = EntityManager.AddEntity().AddComponent<AnimatedSpriteComponent>();
-            animatedCharacter.ImportSheet("assets/landscape", new Vector2Int(120, 50));
-            animatedCharacter.animationDelay = 50;
-            animatedCharacter.Transform.position = new Vector2(0, 0);
-                        
+            /*AnimatedSpriteComponent animatedCharacter = EntityManager.AddEntity().AddComponent<AnimatedSpriteComponent>();
+            animatedCharacter.ImportSheet("assets/landscape", new Vector2Int(120, 45));
+            animatedCharacter.animationDelay = 0;
+            animatedCharacter.Transform.position = new Vector2(0, 0);*/
+
+            ProcessRendererComponent processRenderer = EntityManager.AddEntity().AddComponent<ProcessRendererComponent>();
+            processRenderer.AttachProcess(Process.GetProcessById(6936).Handle);
+            
             int iterations = 0;
-            int iterationCount = 10;
-
-            RenderData average = new RenderData();
-
+            int maxInterations = 20;
+            
             while (game.IsRunning)
             {
+                game.StartFrame();
+
                 game.HandleEvents();
                 game.Update();
                 game.Render();
 
-                iterations++;
+                game.WaitFrame();
+                game.EndFrame();
 
-                average.CalculationTime += game.Renderer.LastRenderData.CalculationTime;
-                average.GlobalTime += game.Renderer.LastRenderData.GlobalTime;
-                average.ReleaseTime += game.Renderer.LastRenderData.ReleaseTime;
-                average.WriteTime += game.Renderer.LastRenderData.WriteTime;
-
-                if (iterations >= iterationCount)
+                if(iterations++ >= maxInterations)
                 {
-                    Console.Title = average.ToString();
-                    average = new RenderData();
+                    WinApi.SetConsoleTitle("FPS : " + Math.Ceiling(1000 / game.FrameDuration.TotalMilliseconds));
                     iterations = 0;
                 }
-
-                game.WaitFrame();
             }
 
             game.Clean();

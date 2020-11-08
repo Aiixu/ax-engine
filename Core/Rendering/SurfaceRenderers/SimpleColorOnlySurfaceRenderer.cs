@@ -14,11 +14,13 @@ namespace Ax.Engine.Core.Rendering
         {
             BeginRelRecord();
 
-            byte[] buffer = new byte[screenWidth * screenHeight * 20];
+            int surfaceSize = screenWidth * screenHeight;
+
+            byte[] buffer = new byte[surfaceSize * 20];
             int positionInBuffer = 0;
 
-            RgbSurfaceItem[] flattenSurface = new RgbSurfaceItem[screenWidth * screenHeight];
-            bool[] flattenSurfaceSet = new bool[screenWidth * screenHeight];
+            RgbSurfaceItem[] flattenSurface = new RgbSurfaceItem[surfaceSize];
+            bool[] flattenSurfaceSet = new bool[surfaceSize];
             int index = 0;
 
             for (int y = 0; y < screenHeight; y++)
@@ -26,15 +28,19 @@ namespace Ax.Engine.Core.Rendering
                 for (int x = 0; x < screenWidth; x++)
                 {
                     flattenSurface[index] = surface[x, y] == null ? default : (RgbSurfaceItem)surface[x, y];
-                    flattenSurfaceSet[index++] = surfaceSet[x, y];
+                    flattenSurfaceSet[index] = surfaceSet[x, y];
+
+                    index++;
                 }
             }
 
-            for (int i = 0; i < flattenSurface.Length; i++)
+            for (int i = 0; i < surfaceSize; i++)
             {
                 int count = 1;
-                while (
-                    i < flattenSurface.Length - 1 &&
+
+                // count contiguous surface items
+                while(
+                    i < surfaceSize - 1 &&
                     ((!flattenSurfaceSet[i] && !flattenSurfaceSet[i + 1]) ||
                     (flattenSurfaceSet[i] && flattenSurface[i].Equals(flattenSurface[i + 1]))))
                 {
@@ -42,14 +48,14 @@ namespace Ax.Engine.Core.Rendering
                     count++;
                 }
 
-                byte[] charBytes = new byte[count];
-                Memset(charBytes, 0, count, 32);
+                byte[] surfaceItemSeq = flattenSurface[i].Bytes ?? RgbSurfaceItem.BaseColorSequence;
+                // set to background
+                surfaceItemSeq[2] = 52;
 
-                byte[] seqBytes = flattenSurface[i].Bytes ?? RgbSurfaceItem.BaseColorSequence;
-                seqBytes[2] = 52;
-
-                Buffer.BlockCopy(seqBytes, 0, buffer, positionInBuffer, 19);
-                Buffer.BlockCopy(charBytes, 0, buffer, positionInBuffer + 19, count);
+                // block copy color sequence
+                Buffer.BlockCopy(surfaceItemSeq, 0, buffer, positionInBuffer, 19);
+                // set chars in buffer
+                Memset(buffer, positionInBuffer + 19, count, 32); // 32 -> white space
 
                 positionInBuffer += 19 + count;
             }
@@ -69,6 +75,8 @@ namespace Ax.Engine.Core.Rendering
 
         public override bool Render(ISurfaceItem c, int x, int y)
         {
+            if(x < 0 || x >= screenWidth || y < 0 || y >= screenHeight) { return false; }
+
             BeginClcRecord();
 
             surface[x, y] = c;

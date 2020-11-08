@@ -10,6 +10,8 @@ using Ax.Engine.Core.Rendering;
 using static Ax.Engine.Core.Native.WinApi;
 using static Ax.Engine.Core.Native.WinUser;
 
+// TODO: link console to process (not component, project example), remove ProcessRendererComponent
+
 namespace Ax.Engine
 {
     public sealed class Game
@@ -23,6 +25,9 @@ namespace Ax.Engine
 
         public InputHandler Input { get; private set; }
         public SurfaceRenderer Renderer { get; private set; }
+
+        public DateTime FrameStart { get; private set; }
+        public TimeSpan FrameDuration { get; private set; }
 
         public Game(SurfaceRenderer renderer, InputHandler inputHandler) 
         {
@@ -76,6 +81,16 @@ namespace Ax.Engine
             Imaging.CaptureWindowToFile(GetConsoleWindow(), outPath);
         }
 
+        public void StartFrame()
+        {
+            FrameStart = DateTime.Now;
+        }
+
+        public void EndFrame()
+        {
+            FrameDuration = DateTime.Now - FrameStart;
+        }
+
         public void Update()
         {
             if (!IsRunning) { return; }
@@ -127,7 +142,12 @@ namespace Ax.Engine
 
         public void WaitFrame()
         {
-            Renderer.OutputHandler.WaitFrame();
+            TimeSpan currentFrameTime = DateTime.Now - FrameStart;
+
+            if (currentFrameTime.TotalMilliseconds <= Renderer.OutputHandler.Info.frameDelay)
+            {
+                Thread.Sleep((int)(Renderer.OutputHandler.Info.frameDelay - currentFrameTime.TotalMilliseconds));
+            }
         }
 
         public void Clean()
@@ -140,9 +160,6 @@ namespace Ax.Engine
 
             Input.Disable();
             Renderer.OutputHandler.Disable();
-
-            /*_cursorKeysMode = VTCursorKeysMode.Normal;
-            _keypadMode = VTKeypadMode.Numeric;*/
 
             Console.WriteLine("Game cleaned.");
             Console.ReadKey();

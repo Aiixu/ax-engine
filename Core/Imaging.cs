@@ -13,7 +13,7 @@ namespace Ax.Engine.Core
         ///  Creates an Image object containing a screen shot of the entire desktop
         /// </summary>
         /// <returns>An Image containing a screen shot of the entire desktop</returns>
-        public static Image CaptureScreen()
+        public static Bitmap CaptureScreen()
         {
             return CaptureWindow(GetDesktopWindow());
         }
@@ -22,7 +22,7 @@ namespace Ax.Engine.Core
         ///  Creates an Image object containing a screen shot of the entire desktop
         /// </summary>
         /// <returns>An Image containing a screen shot of the entire desktop</returns>
-        public static Image CaptureScreenToFile()
+        public static Bitmap CaptureScreenToFile()
         {
             return CaptureWindow(GetDesktopWindow());
         }
@@ -33,7 +33,7 @@ namespace Ax.Engine.Core
         /// <param name="filename">Target file name</param>
         public static void CaptureScreenToFile(string filename)
         {
-            Image img = CaptureScreen();
+            Bitmap img = CaptureScreen();
             img.Save(filename);
         }
 
@@ -44,7 +44,7 @@ namespace Ax.Engine.Core
         /// <param name="format">Format of the image</param>
         public static void CaptureScreenToFile(string filename, ImageFormat format)
         {
-            Image img = CaptureScreen();
+            Bitmap img = CaptureScreen();
             img.Save(filename, format);
         }
 
@@ -53,7 +53,7 @@ namespace Ax.Engine.Core
         /// </summary>
         /// <param name="handle">The handle to the window.</param>
         /// <returns>An Image containing a screen shot of the target window</returns>
-        public static Image CaptureWindow(IntPtr handle)
+        public static Bitmap CaptureWindow(IntPtr handle)
         {
             IntPtr hdcSrc = GetWindowDC(handle);
 
@@ -76,7 +76,7 @@ namespace Ax.Engine.Core
             DeleteDC(hdcDest);
             ReleaseDC(handle, hdcSrc);
 
-            Image img = Image.FromHbitmap(hBitmap);
+            Bitmap img = Image.FromHbitmap(hBitmap);
             DeleteObject(hBitmap);
 
             return img;
@@ -89,7 +89,7 @@ namespace Ax.Engine.Core
         /// <param name="filename">Target file name</param>
         public static void CaptureWindowToFile(IntPtr handle, string filename)
         {
-            Image img = CaptureWindow(handle);
+            Bitmap img = CaptureWindow(handle);
             img.Save(filename);
         }
 
@@ -101,7 +101,7 @@ namespace Ax.Engine.Core
         /// <param name="format">Format of the image</param>
         public static void CaptureWindowToFile(IntPtr handle, string filename, ImageFormat format)
         {
-            Image img = CaptureWindow(handle);
+            Bitmap img = CaptureWindow(handle);
             img.Save(filename, format);
         }
     }

@@ -17,7 +17,7 @@ namespace Ax.Engine.Core.Native
         /// <summary>
         ///  Places the window at the top of the Z order.
         /// </summary>
-        public static readonly IntPtr HWND_TOP = new IntPtr(0);
+        public static readonly IntPtr HWND_TOP = IntPtr.Zero;
 
         /// <summary>
         ///  Places the window above all non-topmost windows. The window maintains its topmost position even when it is deactivated.

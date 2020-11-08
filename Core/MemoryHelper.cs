@@ -7,40 +7,45 @@ namespace Ax.Engine.Core
 {
     public static class MemoryHelper
     {
-        private delegate void MemorySetter(IntPtr array, byte value, int count);
+        private delegate void MemorySetter(IntPtr arr, byte val, int count);
 
         private static readonly MemorySetter MemsetDelegate;
 
         static MemoryHelper()
         {
-            // Initialize Memset
-            DynamicMethod m = new DynamicMethod("memset", 
-                MethodAttributes.Public | MethodAttributes.Static, CallingConventions.Standard, 
-                typeof(void), new[] { typeof(IntPtr), typeof(byte), typeof(int) }, typeof(MemoryHelper), false);
+            // Init memset
+            DynamicMethod dynamicMemset = new DynamicMethod("memset",
+                MethodAttributes.Public | MethodAttributes.Static,
+                CallingConventions.Standard,
+                typeof(void), new[] { typeof(IntPtr), typeof(byte), typeof(int) },
+                typeof(MemoryHelper), false);
 
-            ILGenerator il = m.GetILGenerator();
-            il.Emit(OpCodes.Ldarg_0); // address
-            il.Emit(OpCodes.Ldarg_1); // initialization value
-            il.Emit(OpCodes.Ldarg_2); // number of bytes
-            il.Emit(OpCodes.Initblk);
-            il.Emit(OpCodes.Ret);
+            ILGenerator ilMemset = dynamicMemset.GetILGenerator();
+            ilMemset.Emit(OpCodes.Ldarg_0); // addr
+            ilMemset.Emit(OpCodes.Ldarg_1); // val
+            ilMemset.Emit(OpCodes.Ldarg_2); // count
+            ilMemset.Emit(OpCodes.Initblk);
+            ilMemset.Emit(OpCodes.Ret);
 
-            MemsetDelegate = (MemorySetter)m.CreateDelegate(typeof(MemorySetter));
+            MemsetDelegate = (MemorySetter)dynamicMemset.CreateDelegate(typeof(MemorySetter));
         }
 
-        public static void Memset(byte[] array, int start, int count, byte value)
+        public static void Memset(byte[] arr, int start, int count, byte value)
         {
             GCHandle h = default;
             try
             {
-                h = GCHandle.Alloc(array, GCHandleType.Pinned);
-                IntPtr addr = h.AddrOfPinnedObject() + start;
+                // alloc
+                h = GCHandle.Alloc(arr, GCHandleType.Pinned);
+                IntPtr addr = h.AddrOfPinnedObject() + start; // offset address
                 MemsetDelegate(addr, value, count);
             }
             finally
             {
-                if (h.IsAllocated)
+                if(h.IsAllocated)
+                {
                     h.Free();
+                }
             }
         }
     }

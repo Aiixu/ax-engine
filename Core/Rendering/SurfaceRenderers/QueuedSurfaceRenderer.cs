@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using static Ax.Engine.Core.MemoryHelper;
 
@@ -6,16 +7,17 @@ namespace Ax.Engine.Core.Rendering
 {
     internal sealed class QueuedSurfaceRenderer : SurfaceRenderer
     {
-        public QueuedSurfaceRenderer(OutputHandler outputHandler, int screenWidth, int screenHeight)
-            : base(outputHandler, screenWidth, screenHeight)
+        public QueuedSurfaceRenderer(OutputHandler outputHandler, int screenWidth, int screenHeight, bool mesureTime = true)
+            : base(outputHandler, screenWidth, screenHeight, mesureTime)
         { }
-        
+
+        private readonly Queue<byte[]> BufferQueue = new Queue<byte[]>();
+
         public override void ReleaseSurface()
         {
             BeginRelRecord();
 
-            byte[] buffer = new byte[screenWidth * screenHeight * 20];
-            int positionInBuffer = 0;
+            Console.SetCursorPosition(0, 0);
 
             RgbSurfaceItem[] flattenSurface = new RgbSurfaceItem[screenWidth * screenHeight];
             bool[] flattenSurfaceSet = new bool[screenWidth * screenHeight];
@@ -42,27 +44,21 @@ namespace Ax.Engine.Core.Rendering
                     count++;
                 }
 
-                byte[] charBytes = new byte[count];
-                Memset(charBytes, 0, count, 32);
+                int bufferLength = 19 + count;
 
+                byte[] buffer = new byte[bufferLength];
                 byte[] seqBytes = flattenSurface[i].Bytes ?? RgbSurfaceItem.BaseColorSequence;
                 seqBytes[2] = 52;
 
-                Buffer.BlockCopy(seqBytes, 0, buffer, positionInBuffer, 19);
-                Buffer.BlockCopy(charBytes, 0, buffer, positionInBuffer + 19, count);
+                Buffer.BlockCopy(seqBytes, 0, buffer, 0, 19);
+                //Memset(buffer, 19, count, 32);
 
-                positionInBuffer += 19 + count;
+                BufferQueue.Enqueue(buffer);
             }
 
             EndRelRecord();
 
-            BeginWrtRecord();
-
-            Console.SetCursorPosition(0, 0);
-            OutputHandler.Write(buffer, positionInBuffer);
             OutputHandler.EndWrite();
-
-            EndWrtRecord();
 
             EndGlbRecord();
             ExportRecord();

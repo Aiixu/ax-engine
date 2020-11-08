@@ -4,6 +4,7 @@ namespace Ax.Engine.Core.Rendering
 {
     public struct OutputHandlerInfo
     {
+        public COORD size;
         public CONSOLE_FONT_INFOEX font;
         public int frameDelay;
 

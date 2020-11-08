@@ -21,7 +21,7 @@ namespace Ax.Engine.Core.Rendering
             for (int i = 0; i < BUFFER_COUNT; i++)
             {
                 IntPtr bufferPtr = CreateConsoleScreenBuffer(
-                    (long)(BUFFER_ACCESS_MODE.GENERIC_WRITE | BUFFER_ACCESS_MODE.GENERIC_READ),
+                    (uint)(BUFFER_ACCESS_MODE.GENERIC_WRITE | BUFFER_ACCESS_MODE.GENERIC_READ),
                     (uint)(BUFFER_SHARE_MODE.FILE_SHARE_WRITE | BUFFER_SHARE_MODE.FILE_SHARE_READ),
                     new IntPtr(0), 1, new IntPtr(0));
 
@@ -63,10 +63,6 @@ namespace Ax.Engine.Core.Rendering
             // swap buffers
             SetConsoleActiveScreenBuffer(Buffers[WritingBuffer].ptr);
             WritingBuffer = (WritingBuffer + 1) % BUFFER_COUNT;
-
-            // clear buffer
-            byte[] clearSequence = new byte[] { 27, 91, 50, 74 };
-            Write(clearSequence, 4);
         }
     }
 }

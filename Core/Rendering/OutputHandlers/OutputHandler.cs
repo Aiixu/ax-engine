@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Runtime.InteropServices;
 
 using static Ax.Engine.Core.Native.WinApi;
@@ -10,9 +9,7 @@ namespace Ax.Engine.Core.Rendering
     {
         public IntPtr Handle { get; protected set; }
 
-        protected OutputHandlerInfo Info { get; private set; }
-
-        private DateTime lastFrameRendered;
+        public OutputHandlerInfo Info { get; private set; }
 
         public OutputHandler(OutputHandlerInfo info = default)
         {
@@ -25,20 +22,7 @@ namespace Ax.Engine.Core.Rendering
 
         public abstract void Write(byte[] buffer, int count);
 
-        public virtual void EndWrite()
-        {
-            lastFrameRendered = DateTime.Now;
-        }
-
-        public void WaitFrame()
-        {
-            if ((DateTime.Now - lastFrameRendered).TotalMilliseconds >= Info.frameDelay)
-            {
-                lastFrameRendered = DateTime.Now;
-            }
-
-            Thread.Sleep((int)(Info.frameDelay - (DateTime.Now - lastFrameRendered).TotalMilliseconds));
-        }
+        public virtual void EndWrite() { }
 
         protected bool GetStdOut(out IntPtr handle)
         {
@@ -71,11 +55,10 @@ namespace Ax.Engine.Core.Rendering
             CONSOLE_FONT_INFOEX lastFont = new CONSOLE_FONT_INFOEX();
             GetCurrentConsoleFontEx(buffer, false, ref lastFont);
 
-            Info.SetFont(lastFont);
-
             if(fontInfo.Equals(default(CONSOLE_FONT_INFOEX)))
             {
                 fontInfo = lastFont;
+                Info.SetFont(lastFont);
             }
 
             CONSOLE_FONT_INFOEX newFont = new CONSOLE_FONT_INFOEX();
@@ -86,6 +69,8 @@ namespace Ax.Engine.Core.Rendering
             newFont.dwFontSize.Y = fontInfo.dwFontSize.Y;
 
             SetCurrentConsoleFontEx(buffer, false, ref newFont);
+
+            SetConsoleScreenBufferSize(buffer, Info.size);
         }
     }
 }

@@ -12,8 +12,8 @@ namespace Ax.Engine
     public sealed class GameBuilder
     {
         public string WindowName      { get; private set; } = Console.Title;
-        public int WindowWidth        { get; private set; } = Console.WindowWidth;
-        public int WindowHeight       { get; private set; } = Console.WindowHeight;
+        public short WindowWidth      { get; private set; } = (short)Console.WindowWidth;
+        public short WindowHeight     { get; private set; } = (short)Console.WindowHeight;
         public int WindowLeft         { get; private set; } = Console.WindowLeft;
         public int WindowTop          { get; private set; } = Console.WindowTop;
 
@@ -84,7 +84,7 @@ namespace Ax.Engine
             return this;
         }
 
-        public GameBuilder SetSize(int windowWidth, int windowHeight)
+        public GameBuilder SetWindowSize(short windowWidth, short windowHeight)
         {
             WindowWidth = windowWidth;
             WindowHeight = windowHeight;
@@ -100,10 +100,10 @@ namespace Ax.Engine
             return this;
         }
 
-        public GameBuilder SetWindowRect(int windowLeft, int windowTop, int windowWidth, int windowHeight)
+        public GameBuilder SetWindowRect(int windowLeft, int windowTop, short windowWidth, short windowHeight)
         {
             SetPosition(windowLeft, windowTop);
-            SetSize(windowWidth, windowHeight);
+            SetWindowSize(windowWidth, windowHeight);
 
             return this;
         }
@@ -131,10 +131,17 @@ namespace Ax.Engine
 
         public Game Build(uint flags = 0)
         {
+            IntPtr hWnd = GetConsoleWindow();
+            IntPtr hMenu = GetSystemMenu(hWnd, false);
+
+            SetWindowPos(hWnd, IntPtr.Zero, WindowLeft, WindowTop, 0, 0, flags | (uint)SWP.SHOWWINDOW | (uint)SWP.NOSIZE);
+            Console.SetWindowSize(WindowWidth, WindowHeight);
+
             Logger.DebugFolderPath = DebugFolderPath;
 
             OutputHandlerInfo outputHandlerInfo = new OutputHandlerInfo()
             {
+                size = new COORD(WindowWidth, WindowHeight),
                 font = outputFont,
                 frameDelay = 1000 / MaximumFpsCount
             };
@@ -145,19 +152,13 @@ namespace Ax.Engine
             InputHandler inputHandler = new InputHandler();
             inputHandler.Enable();
 
-            IntPtr hWnd = GetConsoleWindow();
-            IntPtr hMenu = GetSystemMenu(hWnd, false);
-
             DeleteMenu(hMenu, (int)SC.MINIMIZE, (int)MF.BYCOMMAND);
             DeleteMenu(hMenu, (int)SC.MAXIMIZE, (int)MF.BYCOMMAND);
             DeleteMenu(hMenu, (int)SC.SIZE, (int)MF.BYCOMMAND);
 
-            SetWindowPos(hWnd, new IntPtr(0), WindowLeft, WindowTop, 0, 0, flags | (uint)SWP.SHOWWINDOW | (uint)SWP.NOSIZE);
             SetConsoleTitle(WindowName);
 
             Console.CursorVisible = false;
-            Console.SetWindowSize(WindowWidth, WindowHeight);
-            Console.SetBufferSize(WindowWidth, WindowHeight);
 
             Thread.Sleep(100);
 

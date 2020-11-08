@@ -36,7 +36,7 @@ namespace Ax.Engine.Core.Rendering
 
         public override void Write(byte[] buffer, int count)
         {
-            WriteConsole(Buffer.ptr, buffer, count, out _, new IntPtr(0));
+            WriteConsole(Buffer.ptr, buffer, count, out _, IntPtr.Zero);
         }
 
         public override void EndWrite()

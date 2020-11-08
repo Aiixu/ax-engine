@@ -16,7 +16,7 @@ namespace Ax.Engine.Core.Native
         /// <param name="dwFlags">The type of console screen buffer to create.</param>
         /// <param name="lpScreenBufferData">Reserved; should be <see langword="null"/>.</param>
         /// <returns>If the function succeeds, the return value is a handle to the new console screen buffer.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr CreateConsoleScreenBuffer([In] long dwDesiredAccess, [In] uint dwShareMode, [In, Optional] IntPtr lpSecurityAttributes, [In] uint dwFlags, IntPtr lpScreenBufferData);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr CreateConsoleScreenBuffer([In] uint dwDesiredAccess, [In] uint dwShareMode, [In, Optional] IntPtr lpSecurityAttributes, [In] uint dwFlags, IntPtr lpScreenBufferData);
 
         /// <summary>
         ///  Retrieves information about the specified console screen buffer.
