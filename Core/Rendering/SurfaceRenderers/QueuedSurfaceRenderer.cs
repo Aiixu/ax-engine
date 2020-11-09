@@ -1,20 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Threading;
 using static Ax.Engine.Core.MemoryHelper;
 
 namespace Ax.Engine.Core.Rendering
 {
     internal sealed class QueuedSurfaceRenderer : SurfaceRenderer
     {
+        private readonly ProducerConsumerQueue<byte[]> bufferQueue;
+
         public QueuedSurfaceRenderer(OutputHandler outputHandler, int screenWidth, int screenHeight, bool mesureTime = true)
             : base(outputHandler, screenWidth, screenHeight, mesureTime)
-        { }
-
-        private readonly Queue<byte[]> BufferQueue = new Queue<byte[]>();
+        {
+            bufferQueue = new ProducerConsumerQueue<byte[]>();
+        }
 
         public override void ReleaseSurface()
         {
+            bufferQueue.Clear();
+
+            // start consumer in new thread
+            Thread consumer = new Thread(new ThreadStart(ConsumerJob));
+            consumer.Start();
+
             BeginRelRecord();
 
             Console.SetCursorPosition(0, 0);
@@ -51,14 +59,36 @@ namespace Ax.Engine.Core.Rendering
                 seqBytes[2] = 52;
 
                 Buffer.BlockCopy(seqBytes, 0, buffer, 0, 19);
-                //Memset(buffer, 19, count, 32);
+                Memset(buffer, 19, count, 32);
 
-                BufferQueue.Enqueue(buffer);
+                bufferQueue.Produce(buffer);
             }
 
-            EndRelRecord();
+            bufferQueue.EndProduction();
+
+            // test only
+
+            while(consumer.IsAlive)
+            {
+            }
+        }
+
+        private void ConsumerJob()
+        {
+            while(bufferQueue.Consume(out byte[] buffer))
+            {
+                if(buffer == null) { continue; }
+
+                BeginWrtRecord();
+
+                OutputHandler.Write(buffer, buffer.Length);
+
+                EndWrtRecord();
+            }
 
             OutputHandler.EndWrite();
+
+            EndRelRecord();
 
             EndGlbRecord();
             ExportRecord();
@@ -66,6 +96,8 @@ namespace Ax.Engine.Core.Rendering
 
         public override bool Render(ISurfaceItem c, int x, int y)
         {
+            if(x < 0 || x >= screenWidth || y < 0 || y >= screenHeight) { return false; }
+
             BeginClcRecord();
 
             surface[x, y] = c;

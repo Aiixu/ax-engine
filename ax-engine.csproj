@@ -140,6 +140,7 @@
     <Compile Include="Core\Native\WinApi\Structs\MENU_EVENT_RECORD.cs" />
     <Compile Include="Core\Native\WinApi\Structs\SMALL_RECT.cs" />
     <Compile Include="Core\Native\WinApi\Structs\WINDOW_BUFFER_SIZE_RECORD .cs" />
+    <Compile Include="Core\ProducerConsumerQueue.cs" />
     <Compile Include="Core\Rendering\RenderData.cs" />
     <Compile Include="Core\Rendering\ISurfaceRenderer.cs" />
     <Compile Include="Core\Rendering\OutputHandlerBufferInfo.cs" />
